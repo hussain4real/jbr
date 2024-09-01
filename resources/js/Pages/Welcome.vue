@@ -35,14 +35,14 @@ function handleImageError() {
 
 <template>
     <Head title="Welcome" />
-    <div class="bg-gray-50 text-black/50 dark:bg-black dark:text-white/50">
+    <div class="bg-gray-500 text-black/50 dark:bg-black dark:text-white/50 bg-fixed" style="background-image:linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('https://images.unsplash.com/photo-1707417091071-f790a4156994?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');">
 
         <div
             class="relative min-h-screen flex flex-col items-center justify-center selection:bg-[#FF2D20] selection:text-white"
         >
-            <div class="relative w-full max-w-2xl px-6 lg:max-w-7xl">
+            <div class="relative w-full max-w-2xl px-0 lg:max-w-7xl">
                 <header class="grid grid-cols-2 items-center gap-2 py-10 lg:grid-cols-3">
-                    <div class="flex lg:justify-center lg:col-start-2">
+                    <div class="flex lg:justify-start lg:col-start-1">
                         <svg
                             class="h-12 w-auto text-white lg:h-16 lg:text-[#FF2D20]"
                             viewBox="0 0 62 65"
@@ -55,7 +55,7 @@ function handleImageError() {
                             />
                         </svg>
                     </div>
-                    <nav v-if="canLogin" class="-mx-3 flex flex-1 justify-end">
+                    <nav v-if="canLogin" class=" flex justify-end lg:col-start-3">
                         <Link
                             v-if="$page.props.auth.user"
                             :href="route('dashboard')"
@@ -83,18 +83,18 @@ function handleImageError() {
                     </nav>
                 </header>
 
-                <main class="mt-6">
+                <main class="mt-2">
                     <div class="bg-cream">
                         <div class="max-w-screen-xl px-8 mx-auto flex flex-col lg:flex-row items-start">
                             <!--Left Col-->
                             <div class="flex flex-col w-full lg:w-6/12 justify-center lg:pt-24 items-start text-center lg:text-left mb-5 md:mb-0">
                                 <h1 data-aos="fade-right" data-aos-once="true" class="my-4 text-5xl font-bold leading-tight text-darken">
-                                    <span class="text-yellow-500">Studying</span> Online is now much easier
+                                    <span class="text-orange-500">Suburban</span> Luxury Resort
                                 </h1>
-                                <p data-aos="fade-down" data-aos-once="true" data-aos-delay="300" class="leading-normal text-2xl mb-8">Skilline is an interesting platform that will teach you in more an interactive way</p>
+                                <p data-aos="fade-down" data-aos-once="true" data-aos-delay="300" class="leading-normal text-2xl mb-8 text-slate-300 ">Situated in the heart of Wahiba Sands, we provide everything you need to enjoy a memorable stay.</p>
                                 <div data-aos="fade-up" data-aos-once="true" data-aos-delay="700" class="w-full md:flex items-center justify-center lg:justify-start md:space-x-5">
-                                    <button class="lg:mx-0 bg-yellow-500 text-white text-xl font-bold rounded-full py-4 px-9 focus:outline-none transform transition hover:scale-110 duration-300 ease-in-out">
-                                        Join for free
+                                    <button class="lg:mx-0 bg-orange-500 text-white text-xl font-bold rounded-full py-4 px-9 focus:outline-none transform transition hover:scale-110 duration-300 ease-in-out">
+                                        Book Now
                                     </button>
                                     <div class="flex items-center justify-center space-x-3 mt-5 md:mt-0 focus:outline-none transform transition hover:scale-110 duration-300 ease-in-out">
                                         <button class="bg-white w-14 h-14 rounded-full flex items-center justify-center">
@@ -102,7 +102,7 @@ function handleImageError() {
                                                 <path d="M22.5751 12.8097C23.2212 13.1983 23.2212 14.135 22.5751 14.5236L1.51538 27.1891C0.848878 27.5899 5.91205e-07 27.1099 6.25202e-07 26.3321L1.73245e-06 1.00123C1.76645e-06 0.223477 0.848877 -0.256572 1.51538 0.14427L22.5751 12.8097Z" fill="#23BDEE"/>
                                             </svg>
                                         </button>
-                                        <span class="cursor-pointer">Watch how it works</span>
+                                        <span class="cursor-pointer text-slate-100">Watch how it works</span>
                                     </div>
                                 </div>
                             </div>
@@ -110,37 +110,41 @@ function handleImageError() {
                             <div class="w-full lg:w-6/12 lg:-mt-10 relative" id="girl">
                                 <img data-aos="fade-up" data-aos-once="true" class="w-10/12 mx-auto 2xl:-mb-20" src="/assets/img/girl.png" />
                                 <!-- calendar -->
-                                <div data-aos="fade-up" data-aos-delay="300" data-aos-once="true" class="absolute top-20 -left-6 sm:top-32 sm:left-10 md:top-40 md:left-16 lg:-left-0 lg:top-52 floating-4">
-                                    <img class="bg-white bg-opacity-80 rounded-lg h-12 sm:h-16" src="/assets/img/calendar.svg">
-                                </div>
+                                <!-- <div data-aos="fade-up" data-aos-delay="300" data-aos-once="true" class="absolute top-20 -left-6 sm:top-32 sm:left-10 md:top-40 md:left-16 lg:-left-0 lg:top-52 floating-4">
+                                    <img class="bg-white bg-opacity-80 rounded-lg h-12 sm:h-16" src="/assets/img/ad_Artboard 1.svg">
+                                </div> -->
                                 <!-- red -->
-                                <div data-aos="fade-up" data-aos-delay="400" data-aos-once="true" class="absolute top-20 right-10 sm:right-24 sm:top-28 md:top-36 md:right-32 lg:top-32 lg:right-16 floating">
-                                    <svg class="h-16 sm:h-24" viewBox="0 0 149 149" fill="none" xmlns="http://www.w3.org/2000/svg"><g filter="url(#filter0_d)"><rect x="40" y="32" width="69" height="69" rx="14" fill="#F3627C"/></g><rect x="51.35" y="44.075" width="47.3" height="44.85" rx="8" fill="white"/><path d="M74.5 54.425V78.575" stroke="#F25471" stroke-width="4" stroke-linecap="round"/><path d="M65.875 58.7375L65.875 78.575" stroke="#F25471" stroke-width="4" stroke-linecap="round"/><path d="M83.125 63.9125V78.575" stroke="#F25471" stroke-width="4" stroke-linecap="round"/><defs><filter id="filter0_d" x="0" y="0" width="149" height="149" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dy="8"/><feGaussianBlur stdDeviation="20"/><feColorMatrix type="matrix" values="0 0 0 0 0.825 0 0 0 0 0.300438 0 0 0 0 0.396718 0 0 0 0.26 0"/><feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow"/><feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow" result="shape"/></filter></defs></svg>
-                                </div>
+                                <!-- <div data-aos="fade-up" data-aos-delay="400" data-aos-once="true" class="absolute top-20 right-10 sm:right-24 sm:top-28 md:top-36 md:right-32 lg:top-32 lg:right-16 floating">
+                                    <img class="bg-white bg-opacity-80 rounded-lg h-12 sm:h-16" src="/assets/img/ad_Artboard 2.svg" alt="">
+                                </div> -->
                                 <!-- ux class -->
-                                <div data-aos="fade-up" data-aos-delay="500" data-aos-once="true" class="absolute bottom-14 -left-4 sm:left-2 sm:bottom-20 lg:bottom-24 lg:-left-4 floating">
+                                <!-- <div data-aos="fade-up" data-aos-delay="500" data-aos-once="true" class="absolute bottom-14 -left-4 sm:left-2 sm:bottom-20 lg:bottom-24 lg:-left-4 floating">
                                     <img class="bg-white bg-opacity-80 rounded-lg h-20 sm:h-28" src="/assets/img/ux-class.svg" alt="">
-                                </div>
+                                </div> -->
                                 <!-- congrats -->
-                                <div data-aos="fade-up" data-aos-delay="600" data-aos-once="true" class="absolute bottom-20 md:bottom-48 lg:bottom-52 -right-6 lg:right-8 floating-4">
+                                <!-- <div data-aos="fade-up" data-aos-delay="600" data-aos-once="true" class="absolute bottom-20 md:bottom-48 lg:bottom-52 -right-6 lg:right-8 floating-4">
                                     <img class="bg-white bg-opacity-80 rounded-lg h-12 sm:h-16" src="/assets/img/congrat.svg" alt="">
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                         <div class="text-white -mt-14 sm:-mt-24 lg:-mt-36 z-40 relative">
                             <svg class="xl:h-40 xl:w-full" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
                                 <path d="M600,112.77C268.63,112.77,0,65.52,0,7.23V120H1200V7.23C1200,65.52,931.37,112.77,600,112.77Z" fill="currentColor"></path>
                             </svg>
-                            <div class="bg-white w-full h-20 -mt-px"></div>
+                            <div class="bg-white w-full h-20 -mt-px text-slate-400">
+                                <p class="text-center mx-auto container text-pretty text-xl">
+                                    Since opening our doors, we have achieved a perfect balance between perfect luxury and simple Arabian nomadic simplicity in camps and tents and its convenience. 
+                                </p>
+                            </div>
                         </div>
                     </div>
 
                     <!-- container -->
-                    <div class="container px-4 lg:px-8 mx-auto max-w-screen-xl text-gray-700 overflow-x-hidden">
+                    <div class="container  px-4 lg:px-8 mx-auto max-w-screen-xl text-gray-700 overflow-x-hidden">
 
                         <!-- trusted by -->
                         <div class="max-w-4xl mx-auto">
-                            <h1 class="text-center mb-3 text-gray-400 font-medium">Trusted by 5,000+ Companies Worldwide</h1>
+                            <h1 class="text-center my-3 text-slate-400 font-medium">Trusted by 5,000+ Companies Worldwide</h1>
                             <div class="grid grid-cols-3 lg:grid-cols-6 gap-4 justify-items-center">
                                 <img class="h-7" src="/assets/img/company/google.svg">
                                 <img class="h-7" src="/assets/img/company/netflix.svg">
@@ -153,8 +157,8 @@ function handleImageError() {
 
                         <!-- All-In-One Cloud Software. -->
                         <div data-aos="flip-up" class="max-w-xl mx-auto text-center mt-24">
-                            <h1 class="font-bold text-darken my-3 text-2xl">All-In-One <span class="text-yellow-500">Cloud Software.</span></h1>
-                            <p class="leading-relaxed text-gray-500">Skilline is one powerful online software suite that combines all the tools needed to run a successful school or office.</p>
+                            <h1 class="font-bold text-darken my-3 text-2xl">All-In-One <span class="text-orange-500">Cloud Software.</span></h1>
+                            <p class="leading-relaxed text-slate-300 text-xl">Skilline is one powerful online software suite that combines all the tools needed to run a successful school or office.</p>
                         </div>
                         <!-- card -->
                         <div class="grid md:grid-cols-3 gap-14 md:gap-5 mt-20">
@@ -201,8 +205,8 @@ function handleImageError() {
                         <!-- lorem -->
                         <div class="mt-28">
                             <div data-aos="flip-down" class="text-center max-w-screen-md mx-auto">
-                                <h1 class="text-3xl font-bold mb-4">What is<span class="text-yellow-500">Skilline?</span></h1>
-                                <p class="text-gray-500">Skilline is a platform that allows educators to create online classes whereby they can store the course materials online; manage assignments, quizzes and exams; monitor due dates; grade results and provide students with feedback all in one place.</p>
+                                <h1 class="text-3xl font-bold mb-4 text-darken">What is <span class="text-orange-500">Skilline?</span></h1>
+                                <p class="text-slate-300 text-xl">Skilline is a platform that allows educators to create online classes whereby they can store the course materials online; manage assignments, quizzes and exams; monitor due dates; grade results and provide students with feedback all in one place.</p>
                             </div>
                             <div data-aos="fade-up" class="flex flex-col md:flex-row justify-center space-y-5 md:space-y-0 md:space-x-6 lg:space-x-10 mt-7">
                                 <div class="relative md:w-5/12">
@@ -228,10 +232,10 @@ function handleImageError() {
 
                         <div class="sm:flex items-center sm:space-x-8 mt-36">
                             <div data-aos="fade-right" class="sm:w-1/2 relative">
-                                <div class="bg-yellow-500 rounded-full absolute w-12 h-12 z-0 -left-4 -top-3 animate-pulse"></div>
-                                <h1 class="font-semibold text-2xl relative z-50 text-darken lg:pr-10">Everything you can do in a physical classroom, <span class="text-yellow-500">you can do with Skilline</span></h1>
-                                <p class="py-5 lg:pr-32">Skilline’s school management software helps traditional and online schools manage scheduling, attendance, payments and virtual classrooms all in one secure cloud-based system.</p>
-                                <a href="" class="underline">Learn More</a>
+                                <div class="bg-orange-500 rounded-full absolute w-12 h-12 z-0 -left-4 -top-3 animate-pulse"></div>
+                                <h1 class="font-semibold text-2xl relative z-50 text-darken lg:pr-10">Everything you can do in a physical classroom, <span class="text-orange-500">you can do with Skilline</span></h1>
+                                <p class="py-5 lg:pr-32 text-xl text-slate-300">Skilline’s school management software helps traditional and online schools manage scheduling, attendance, payments and virtual classrooms all in one secure cloud-based system.</p>
+                                <a href="" class="underline text-lg text-orange-500">Learn More</a>
                             </div>
                             <div data-aos="fade-left" class="sm:w-1/2 relative mt-10 sm:mt-0">
                                 <div style="background: #23BDEE;" class="floating w-24 h-24 absolute rounded-lg z-0 -top-3 -left-3"></div>
@@ -241,7 +245,7 @@ function handleImageError() {
                                         <path d="M22.5751 12.8097C23.2212 13.1983 23.2212 14.135 22.5751 14.5236L1.51538 27.1891C0.848878 27.5899 5.91205e-07 27.1099 6.25202e-07 26.3321L1.73245e-06 1.00123C1.76645e-06 0.223477 0.848877 -0.256572 1.51538 0.14427L22.5751 12.8097Z" fill="#23BDEE"/>
                                     </svg>
                                 </button>
-                                <div class="bg-yellow-500 w-40 h-40 floating absolute rounded-lg z-10 -bottom-3 -right-3"></div>
+                                <div class="bg-orange-500 w-40 h-40 floating absolute rounded-lg z-10 -bottom-3 -right-3"></div>
                             </div>
                         </div>
 
@@ -253,8 +257,8 @@ function handleImageError() {
                                 <div style="background: #5B61EB;" class="w-36 h-36 rounded-full absolute z-0 right-16 -bottom-1 animate-pulse"></div>
                                 <div style="background: #F56666;" class="w-5 h-5 rounded-full absolute z-0 right-52 bottom-1 animate-ping"></div>
                             </div>
-                            <div data-aos="fade-down" class="md:w-5/12 mt-20 md:mt-0 text-gray-500">
-                                <h1 class="text-2xl font-semibold text-darken lg:pr-40">A <span class="text-yellow-500">user interface</span> designed for the classroom</h1>
+                            <div data-aos="fade-down" class="md:w-5/12 mt-20 md:mt-0 text-slate-300">
+                                <h1 class="text-2xl font-semibold text-darken lg:pr-40">A <span class="text-orange-500">user interface</span> designed for the classroom</h1>
                                 <div class="flex items-center space-x-5 my-5">
                                     <div class="flex-shrink bg-white shadow-lg rounded-full p-3 flex items-center justify-center">
                                         <svg class="w-4 h-4" viewBox="0 0 27 26" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -264,7 +268,7 @@ function handleImageError() {
                                             <rect x="14.7727" y="14.1816" width="11.8182" height="11.8182" rx="2" fill="#F48C06"/>
                                         </svg>
                                     </div>
-                                    <p>Teachers don’t get lost in the grid view and have a dedicated Podium space.</p>
+                                    <p class="">Teachers don’t get lost in the grid view and have a dedicated Podium space.</p>
                                 </div>
                                 <div class="flex items-center space-x-5 my-5">
                                     <div class="flex-shrink bg-white shadow-lg rounded-full p-3 flex items-center justify-center">
@@ -289,8 +293,8 @@ function handleImageError() {
                         <!-- Tools For Teachers And Learners -->
                         <div class="flex flex-col md:flex-row items-center md:space-x-10 mt-16">
                             <div data-aos="fade-right" class="md:w-1/2 lg:pl-14">
-                                <h1 class="text-darken font-semibold text-3xl lg:pr-56"><span class="text-yellow-500">Tools</span> For Teachers And Learners</h1>
-                                <p class="text-gray-500 my-4 lg:pr-32">Class has a dynamic set of teaching tools built to be deployed and used during class. Teachers can handout assignments in real-time for students to complete and submit.</p>
+                                <h1 class="text-darken font-semibold text-3xl lg:pr-56"><span class="text-orange-500">Tools</span> For Teachers And Learners</h1>
+                                <p class="text-slate-300 my-4 lg:pr-32">Class has a dynamic set of teaching tools built to be deployed and used during class. Teachers can handout assignments in real-time for students to complete and submit.</p>
                             </div>
                             <img data-aos="fade-left" class="md:w-1/2" src="/assets/img/girl-with-books.png">
                         </div>
@@ -301,16 +305,16 @@ function handleImageError() {
                                 <img class="md:w-11/12" src="/assets/img/true-false.png">
                             </div>
                             <div data-aos="fade-left" class="md:w-6/12 md:transform md:-translate-y-20">
-                                <h1 class="font-semibold text-darken text-3xl lg:pr-64">Assessments, <span class="text-yellow-500">Quizzes</span>, Tests</h1>
-                                <p class="text-gray-500 my-5 lg:pr-52">Easily launch live assignments, quizzes, and tests. Student results are automatically entered in the online gradebook.</p>
+                                <h1 class="font-semibold text-darken text-3xl lg:pr-64">Assessments, <span class="text-orange-500">Quizzes</span>, Tests</h1>
+                                <p class="text-slate-300 my-5 lg:pr-52">Easily launch live assignments, quizzes, and tests. Student results are automatically entered in the online gradebook.</p>
                             </div>
                         </div>
 
                         <!-- Class Management Tools for Educators -->
                         <div class="flex flex-col md:flex-row items-center mt-12">
                             <div data-aos="fade-right" class="md:w-5/12">
-                                <h1 class="text-darken font-semibold text-3xl leading-tight lg:pr-32"><span class="text-yellow-500">Class Management</span> Tools for Educators</h1>
-                                <p class="my-5 lg:pr-14">Class provides tools to help run and manage the class such as Class Roster, Attendance, and more. With the Gradebook, teachers can review and grade tests and quizzes in real-time.</p>
+                                <h1 class="text-darken font-semibold text-3xl leading-tight lg:pr-32"><span class="text-orange-500">Class Management</span> Tools for Educators</h1>
+                                <p class="my-5 lg:pr-14 text-slate-300">Class provides tools to help run and manage the class such as Class Roster, Attendance, and more. With the Gradebook, teachers can review and grade tests and quizzes in real-time.</p>
                             </div>
                             <img data-aos="fade-left" class="md:w-7/12" src="/assets/img/gradebook.png">
                         </div>
@@ -321,12 +325,12 @@ function handleImageError() {
                                 <img class="md:w-11/12" src="/assets/img/discussion.png">
                             </div>
                             <div data-aos="fade-left" class="md:w-5/12 md:transform md:-translate-y-6">
-                                <h1 class="font-semibold text-darken text-3xl lg:pr-64">One-on-One <span class="text-yellow-500">Discussions</span></h1>
-                                <p class="text-gray-500 my-5 lg:pr-24">Teachers and teacher assistants can talk with students privately without leaving the Zoom environment.</p>
+                                <h1 class="font-semibold text-darken text-3xl lg:pr-64">One-on-One <span class="text-orange-500">Discussions</span></h1>
+                                <p class="text-slate-300 my-5 lg:pr-24">Teachers and teacher assistants can talk with students privately without leaving the Zoom environment.</p>
                             </div>
                         </div>
 
-                        <button data-aos="flip-up" class="px-5 py-3 border border-yellow-500 text-yellow-500 font-medium my-14 focus:outline-none transform transition hover:scale-110 duration-300 ease-in-out rounded-full mx-auto block">See more features</button>
+                        <button data-aos="flip-up" class="px-5 py-3 border border-orange-500 text-orange-500 hover:text-slate-300 font-medium my-14 focus:outline-none transform transition hover:scale-110 duration-300 ease-in-out rounded-full mx-auto block hover:bg-orange-500 ">See more features</button>
 
                         <!-- INTEGRATIONS -->
                         <div class="mt-24 flex flex-col md:flex-row items-start md:space-x-10">
@@ -338,9 +342,9 @@ function handleImageError() {
                                     <span class="border border-gray-300 w-14 absolute"></span>
                                     <h1 class="text-gray-400 tracking-widest text-sm">INTEGRATIONS</h1>
                                 </div>
-                                <h1 class="font-semibold text-darken text-2xl lg:pr-40">200+ educational tools and platform <span class="text-yellow-500">integrations</span></h1>
-                                <p class="text-gray-500 my-5 lg:pr-20">Schoology has every tool your classroom needs and comes pre-integrated with more than 200+ tools, student information systems (SIS), and education platforms.</p>
-                                <button class="px-5 py-3 border border-yellow-500 text-yellow-500 font-medium my-4 focus:outline-none transform transition hover:scale-110 duration-300 ease-in-out rounded-full">See All Integrations</button>
+                                <h1 class="font-semibold text-darken text-2xl lg:pr-40">200+ educational tools and platform <span class="text-orange-500">integrations</span></h1>
+                                <p class="text-slate-300 my-5 lg:pr-20">Schoology has every tool your classroom needs and comes pre-integrated with more than 200+ tools, student information systems (SIS), and education platforms.</p>
+                                <button class="px-5 py-3 border border-orange-500 text-orange-500 font-medium my-4 focus:outline-none transform transition hover:scale-110 duration-300 ease-in-out rounded-full hover:bg-orange-500 hover:text-slate-300">See All Integrations</button>
                             </div>
                         </div>
 
@@ -352,12 +356,12 @@ function handleImageError() {
                                     <h1 class="text-gray-400 tracking-widest text-sm">TESTIMONIAL</h1>
                                 </div>
                                 <h1 class="font-semibold text-darken text-2xl lg:pr-40">What They Say?</h1>
-                                <p class="text-gray-500 my-5 lg:pr-36">Skilline has got more than 100k positive ratings from our users around the world.</p>
-                                <p class="text-gray-500 my-5 lg:pr-36">Some of the students and teachers were greatly helped by the Skilline.</p>
-                                <p class="text-gray-500 my-5 lg:pr-36">Are you too? Please give your assessment</p>
-                                <button class="flex items-center space-x-3 pl-3 border-b border-l border-t border-yellow-500 text-yellow-500 font-medium my-4 focus:outline-none transform transition hover:scale-110 duration-300 ease-in-out rounded-full">
+                                <p class="text-slate-300 my-5 lg:pr-36">Skilline has got more than 100k positive ratings from our users around the world.</p>
+                                <p class="text-slate-300 my-5 lg:pr-36">Some of the students and teachers were greatly helped by the Skilline.</p>
+                                <p class="text-slate-300 my-5 lg:pr-36">Are you too? Please give your assessment</p>
+                                <button class="flex items-center space-x-3 pl-3 border-b border-l border-t border-orange-500 text-orange-500 font-medium my-4 focus:outline-none transform transition hover:scale-110 duration-300 ease-in-out rounded-full hover:bg-orange-500 hover:text-slate-300">
                                     <span>Write your assessment</span>
-                                    <div class="border border-yellow-500 h-14 w-14 rounded-full flex items-center justify-center">
+                                    <div class="border border-orange-500 h-14 w-14 rounded-full flex items-center justify-center">
                                         <svg class="w-5 h-5" viewBox="0 0 26 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M25.7071 8.70711C26.0976 8.31658 26.0976 7.68342 25.7071 7.2929L19.3431 0.928934C18.9526 0.538409 18.3195 0.538409 17.9289 0.928934C17.5384 1.31946 17.5384 1.95262 17.9289 2.34315L23.5858 8L17.9289 13.6569C17.5384 14.0474 17.5384 14.6805 17.9289 15.0711C18.3195 15.4616 18.9526 15.4616 19.3431 15.0711L25.7071 8.70711ZM-8.74228e-08 9L25 9L25 7L8.74228e-08 7L-8.74228e-08 9Z" fill="#F48C06"/>
                                         </svg>
@@ -429,9 +433,9 @@ function handleImageError() {
 
                 </main>
 
-                <footer class="mt-32" style="background-color: rgba(37, 38, 65, 1);">
-                    <div class="max-w-lg mx-auto">
-                        <div class="flex py-12 justify-center text-white items-center px-20 sm:px-36">
+                <footer class="mt-32 " style="background-color: rgba(37, 38, 65, 1);">
+                    <div class="max-w-lg mx-auto flex container justify-center items-center gap-16">
+                        <div class="flex py-12 justify-center text-white items-center">
                             <div class="relative">
                                 <h1 class="font-bold text-xl pr-5 relative z-50">Skilline</h1>
                                 <svg class="w-11 h-11 absolute -top-2 -left-3 z-40" viewBox="0 0 79 79" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -452,13 +456,10 @@ function handleImageError() {
                             <a href="" class="border-l border-gray-400 px-3">Privacy</a>
                             <a href="" class="border-l border-gray-400 pl-3">Terms & Conditions</a>
                         </div>
-                        <div class="text-center text-white">
-                            <p class="my-3 text-gray-400 text-sm">&copy; 2021 Class Technologies Inc. </p>
-                            <div class="py-3 tracking-wide">
-                                <p>Code By <span class="font-semibold">mhaecal</span></p>
-                                <p>UI/UX By <span class="font-semibold">Irvan Moses</span></p>
-                            </div>
-                        </div>
+                    </div>
+                    <div class="text-center text-white py-3">
+                        <p class=" text-slate-400 text-sm">&copy; 2021 Class Technologies Inc. </p>
+                    
                     </div>
                 </footer>
             </div>
@@ -468,7 +469,9 @@ function handleImageError() {
 <style scoped>
 /*primary color*/
 .bg-cream {
-    background-color: #FFF2E1;
+    background:linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2946&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D') no-repeat center center/cover;
+    /* make it a bit darker */
+    /* background-color: rgba(37, 38, 65, 0.9); */
 }
 
 /*font*/
@@ -476,12 +479,12 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
-.bg-yellow-500 {
+/* .bg-orange-500 {
     background-color: #F48C06;
 }
-.text-yellow-500 {
+.text-orange-500 {
     color: #F48C06;
-}
+} */
 .floating {
     animation-name: floating;
     animation-duration: 3s;
