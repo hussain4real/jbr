@@ -2,7 +2,8 @@
 import { Head, Link } from "@inertiajs/vue3";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
+import ApartmentCards from "@/Components/ApartmentCards.vue";
 
 defineProps({
     canLogin: {
@@ -31,6 +32,79 @@ function handleImageError() {
     document.getElementById("docs-card-content")?.classList.add("!flex-row");
     document.getElementById("background")?.classList.add("!hidden");
 }
+
+const apartments = ref([
+    {
+        id: 1,
+        name: "Apartment 1",
+        description: "This is a description for apartment 1",
+        price: 1000,
+        image: "https://via.placeholder.com/150",
+    },
+    {
+        id: 2,
+        name: "Apartment 2",
+        description: "This is a description for apartment 2",
+        price: 2000,
+        image: "https://via.placeholder.com/150",
+    },
+    {
+        id: 3,
+        name: "Apartment 3",
+        description: "This is a description for apartment 3",
+        price: 3000,
+        image: "https://via.placeholder.com/150",
+    },
+    {
+        id: 4,
+        name: "Apartment 4",
+        description: "This is a description for apartment 4",
+        price: 4000,
+        image: "https://via.placeholder.com/150",
+    },
+    {
+        id: 5,
+        name: "Apartment 5",
+        description: "This is a description for apartment 5",
+        price: 5000,
+        image: "https://via.placeholder.com/150",
+    },
+    {
+        id: 6,
+        name: "Apartment 6",
+        description: "This is a description for apartment 6",
+        price: 6000,
+        image: "https://via.placeholder.com/150",
+    },
+    {
+        id: 7,
+        name: "Apartment 7",
+        description: "This is a description for apartment 7",
+        price: 7000,
+        image: "https://via.placeholder.com/150",
+    },
+    {
+        id: 8,
+        name: "Apartment 8",
+        description: "This is a description for apartment 8",
+        price: 8000,
+        image: "https://via.placeholder.com/150",
+    },
+    {
+        id: 9,
+        name: "Apartment 9",
+        description: "This is a description for apartment 9",
+        price: 9000,
+        image: "https://via.placeholder.com/150",
+    },
+    {
+        id: 10,
+        name: "Apartment 10",
+        description: "This is a description for apartment 10",
+        price: 10000,
+        image: "https://via.placeholder.com/150",
+    },
+]);
 </script>
 
 <template>
@@ -928,6 +1002,14 @@ function handleImageError() {
                                     src="/assets/img/testimonials.png"
                                 />
                             </div>
+                        </div>
+
+                        <!-- featured apartments -->
+                        <div class="container mx-auto">
+                            <h1 class="text-3xl text-center font-bold text-orange-500 my-8">
+                                Featured Apartments
+                            </h1>
+                            <ApartmentCards :apartments="apartments" />
                         </div>
 
                         <!-- Latest News and Resources -->
