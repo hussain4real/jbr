@@ -2,10 +2,10 @@
 import { Head, Link } from "@inertiajs/vue3";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { onMounted, ref } from "vue";
-import ApartmentCards from "@/Components/ApartmentCards.vue";
+import { onMounted, ref, toRefs } from "vue";
+import FeaturedApartmentCards from "@/Components/FeaturedApartmentCards.vue";
 
-defineProps({
+const props = defineProps({
     canLogin: {
         type: Boolean,
     },
@@ -20,7 +20,18 @@ defineProps({
         type: String,
         required: true,
     },
+    featuredApartments: {
+        type: Array,
+    }
+
+
+
 });
+
+// Access the props using toRefs
+const { featuredApartments } = toRefs(props);
+//filter by available status
+const availableApartments = featuredApartments.value.filter((apartment) => apartment.status === "available");
 
 onMounted(() => {
     AOS.init();
@@ -32,79 +43,6 @@ function handleImageError() {
     document.getElementById("docs-card-content")?.classList.add("!flex-row");
     document.getElementById("background")?.classList.add("!hidden");
 }
-
-const apartments = ref([
-    {
-        id: 1,
-        name: "Apartment 1",
-        description: "This is a description for apartment 1",
-        price: 1000,
-        image: "https://via.placeholder.com/150",
-    },
-    {
-        id: 2,
-        name: "Apartment 2",
-        description: "This is a description for apartment 2",
-        price: 2000,
-        image: "https://via.placeholder.com/150",
-    },
-    {
-        id: 3,
-        name: "Apartment 3",
-        description: "This is a description for apartment 3",
-        price: 3000,
-        image: "https://via.placeholder.com/150",
-    },
-    {
-        id: 4,
-        name: "Apartment 4",
-        description: "This is a description for apartment 4",
-        price: 4000,
-        image: "https://via.placeholder.com/150",
-    },
-    {
-        id: 5,
-        name: "Apartment 5",
-        description: "This is a description for apartment 5",
-        price: 5000,
-        image: "https://via.placeholder.com/150",
-    },
-    {
-        id: 6,
-        name: "Apartment 6",
-        description: "This is a description for apartment 6",
-        price: 6000,
-        image: "https://via.placeholder.com/150",
-    },
-    {
-        id: 7,
-        name: "Apartment 7",
-        description: "This is a description for apartment 7",
-        price: 7000,
-        image: "https://via.placeholder.com/150",
-    },
-    {
-        id: 8,
-        name: "Apartment 8",
-        description: "This is a description for apartment 8",
-        price: 8000,
-        image: "https://via.placeholder.com/150",
-    },
-    {
-        id: 9,
-        name: "Apartment 9",
-        description: "This is a description for apartment 9",
-        price: 9000,
-        image: "https://via.placeholder.com/150",
-    },
-    {
-        id: 10,
-        name: "Apartment 10",
-        description: "This is a description for apartment 10",
-        price: 10000,
-        image: "https://via.placeholder.com/150",
-    },
-]);
 </script>
 
 <template>
@@ -205,11 +143,12 @@ const apartments = ref([
                                     data-aos-delay="700"
                                     class="w-full md:flex items-center justify-center lg:justify-start md:space-x-5"
                                 >
-                                    <button
+                                    <Link
+                                        :href="route('apartments.index')"
                                         class="lg:mx-0 bg-orange-500 text-white text-xl font-bold rounded-full py-4 px-9 focus:outline-none transform transition hover:scale-110 duration-300 ease-in-out"
                                     >
                                         Book Now
-                                    </button>
+                                    </Link>
                                     <div
                                         class="flex items-center justify-center space-x-3 mt-5 md:mt-0 focus:outline-none transform transition hover:scale-110 duration-300 ease-in-out"
                                     >
@@ -1005,11 +944,13 @@ const apartments = ref([
                         </div>
 
                         <!-- featured apartments -->
-                        <div class="container mx-auto">
-                            <h1 class="text-3xl text-center font-bold text-orange-500 my-8">
+                        <div class="container mx-auto" data-aos="zoom-in-left">
+                            <h1
+                                class="text-3xl text-center font-bold text-orange-500 my-8"
+                            >
                                 Featured Apartments
                             </h1>
-                            <ApartmentCards :apartments="apartments" />
+                            <FeaturedApartmentCards :apartments="availableApartments" :horizontalScroll="true"/>
                         </div>
 
                         <!-- Latest News and Resources -->
