@@ -19,6 +19,8 @@
         "vue": "^3.4.0"
     },
     "dependencies": {
-        "aos": "^3.0.0-beta.6"
+        "aos": "^3.0.0-beta.6",
+        "flowbite": "^2.5.1",
+        "flowbite-vue": "^0.1.6"
     }
 }
