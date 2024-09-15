@@ -6,7 +6,7 @@ const props = defineProps({
     apartments: Array,
 });
 
-const { apartments } = toRefs(props);
+//const { apartments } = toRefs(props);
 
 // const featuredApartments = computed(() =>
 //   apartments.value.filter(apartment => apartment.featured)
