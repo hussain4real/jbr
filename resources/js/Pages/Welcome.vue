@@ -1178,7 +1178,7 @@ function handleImageError() {
     background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
         url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2946&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")
             no-repeat center center/cover;
-            /* add top right border radius */
+    /* add top right border radius */
     border-top-right-radius: 1rem;
     border-top-left-radius: 1rem;
     /* make it a bit darker */
