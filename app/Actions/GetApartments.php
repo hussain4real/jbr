@@ -24,6 +24,7 @@ class GetApartments
      */
     public function __invoke()
     {
-        return Apartment::all();
+        return Apartment::latest()->paginate(10);
+        
     }
 }

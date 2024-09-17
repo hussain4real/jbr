@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\GetApartments;
+use App\Http\Resources\ApartmentResource;
 use App\Models\Apartment;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -15,9 +16,10 @@ class ApartmentController extends Controller
     public function index(GetApartments $getApartments)
     {
         $apartments = $getApartments();
+        // dd($apartments);
 
         return Inertia::render('Apartments/Index', [
-            'apartments' => $apartments,
+            'apartments' => ApartmentResource::collection($apartments),
         ]);
     }
     

@@ -2,14 +2,14 @@
 import { computed, toRefs } from "vue";
 
 const props = defineProps({
-    apartments: Array,
+    apartments: Object,
 });
 </script>
 <template>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div
             class="relative mx-auto w-full"
-            v-for="apartment in apartments"
+            v-for="apartment in apartments.data"
             :key="apartment.id"
         >
             <a
@@ -180,7 +180,19 @@ const props = defineProps({
                     </div>
                     <div class="mt-8 grid grid-cols-2">
                         <div class="flex items-center">
-                            <div class="relative">
+                            <ul
+                                class="flex space-x-2"
+                                v-for="amenities in apartment.amenities"
+                            >
+                                <li
+                                    class="mx-1 px-1 text-sm text-gray-800 bg-slate-300/40 rounded shadow capitalize hover:bg-teal-500 hover:text-white"
+                                >
+                                    <div>
+                                        {{ amenities }}
+                                    </div>
+                                </li>
+                            </ul>
+                            <!-- <div class="relative">
                                 <div
                                     class="h-6 w-6 rounded-full bg-gray-200 md:h-8 md:w-8"
                                 ></div>
@@ -191,7 +203,7 @@ const props = defineProps({
 
                             <p class="line-clamp-1 ml-2 text-gray-800">
                                 Salman Ghouri Dev
-                            </p>
+                            </p> -->
                         </div>
 
                         <div class="flex justify-end space-x-2 items-center">
