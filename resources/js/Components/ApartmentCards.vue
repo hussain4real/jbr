@@ -4,35 +4,9 @@ import { computed, toRefs } from "vue";
 const props = defineProps({
     apartments: Array,
 });
-
-// const { apartments } = toRefs(props);
 </script>
 <template>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <!-- <div
-            v-for="apartment in apartments"
-            :key="apartment.id"
-            class="bg-white rounded-lg shadow-lg"
-        >
-            <img
-                src="https://via.placeholder.com/150"
-                :alt="apartment.name"
-                class="w-full h-48 object-cover rounded-t-lg"
-            />
-            <div class="p-4">
-                <h2 class="text-xl font-semibold text-gray-800">
-                    {{ apartment.name }}
-                </h2>
-                <p class="text-gray-600 mt-2">
-                    {{ apartment.description }}
-                </p>
-                
-                <p class="text-orange-500 font-bold mt-4">
-                    ${{ apartment.price }}/month
-                </p>
-            </div>
-        </div> -->
-
         <div
             class="relative mx-auto w-full"
             v-for="apartment in apartments"
@@ -150,12 +124,12 @@ const props = defineProps({
                     </div>
                     <div class="justify-center">
                         <div
-                            class="mt-4 flex space-x-6 overflow-hidden rounded-lg px-1 pt-3"
+                            class="mt-4 flex space-x-6 overflow-hidden rounded-lg px-1 pt-4"
                         >
                             <p
                                 class="flex items-center font-medium text-gray-800"
                             >
-                                <font-awesome-layers full-width>
+                                <font-awesome-layers full-width class="ml-2">
                                     <font-awesome-icon
                                         :icon="['fas', 'bed']"
                                         class="text-teal-600"
@@ -163,7 +137,7 @@ const props = defineProps({
                                     <font-awesome-layers-text
                                         value="5"
                                         position="top-right"
-                                        transform="down-1 shrink-3"
+                                        transform="down-0 up-2 shrink-3"
                                         class="text-orange-400 font-bold"
                                     />
                                 </font-awesome-layers>
@@ -178,9 +152,9 @@ const props = defineProps({
                                         class="text-teal-600"
                                     />
                                     <font-awesome-layers-text
-                                        value="3"
+                                        :value="apartment.bathrooms"
                                         position="top-right"
-                                        transform="down-1 shrink-3"
+                                        transform="down-0 up-2 shrink-3"
                                         class="text-orange-400 font-bold"
                                     />
                                 </font-awesome-layers>
@@ -194,10 +168,10 @@ const props = defineProps({
                                         class="text-teal-600"
                                     />
                                     <font-awesome-layers-text
-                                        value="5"
-                                        position="top-left"
-                                        transform="down-1 shrink-3"
-                                        class="text-orange-400 font-bold bg-slate-300 px-1 text-center rounded-full"
+                                        :value="`${apartment.area}sqm`"
+                                        position="top-right"
+                                        transform="down-0 up-2 shrink-3"
+                                        class="text-orange-400 font-bold"
                                     />
                                 </font-awesome-layers>
                                 <!-- 2000 Yd<sup>2</sup> -->
