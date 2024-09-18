@@ -1,9 +1,20 @@
 <script setup>
 import { ref, watch } from "vue";
 
+const props = defineProps({
+    apartmentTypes: {
+        type: Array,
+        required: true,
+    },
+    amenitiesOptions: {
+        type: Array,
+        required: true,
+    },
+});
 // Define the available filter options (you can update this based on your data)
-const apartmentTypes = ["Apartment", "Villa", "House"];
-const amenitiesOptions = ["Wifi", "Kitchen", "TV", "Gym", "Pool", "Parking"];
+//get apartment types as props
+const apartmentTypes = ref(props.apartmentTypes);
+const amenitiesOptions = ref(props.amenitiesOptions);
 const priceRange = ref([0, 1000]);
 
 const filters = ref({
@@ -22,6 +33,7 @@ watch(
     filters,
     (newFilters) => {
         emit("updateFilters", newFilters);
+        console.log("filters", newFilters);
     },
     { deep: true }
 );

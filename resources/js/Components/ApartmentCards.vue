@@ -1,16 +1,80 @@
 <script setup>
-import { computed, toRefs } from "vue";
-
+import { computed, ref } from "vue";
+import FilterComponent from "@/Components/Filter.vue";
 const props = defineProps({
     apartments: Object,
 });
+
+// Define state for filtered apartments
+const filteredApartments = ref(props.apartments.data);
+
+// Function to apply filters to the apartments
+const applyFilters = (filters) => {
+    filteredApartments.value = props.apartments.data.filter((apartment) => {
+        // Filter by type
+        if (filters.type && apartment.type !== filters.type) return false;
+
+        // Filter by price range
+        if (filters.minPrice !== null && apartment.price < filters.minPrice)
+            return false;
+        if (filters.maxPrice !== null && apartment.price > filters.maxPrice)
+            return false;
+
+        // Filter by bedrooms
+        if (filters.bedrooms !== null && apartment.bedrooms < filters.bedrooms)
+            return false;
+
+        // Filter by bathrooms
+        if (
+            filters.bathrooms !== null &&
+            apartment.bathrooms < filters.bathrooms
+        )
+            return false;
+
+        // Filter by amenities (all selected amenities must be present)
+        if (
+            filters.amenities.length > 0 &&
+            !filters.amenities.every((amenity) =>
+                apartment.amenities.includes(amenity)
+            )
+        ) {
+            return false;
+        }
+
+        return true;
+    });
+};
+const apartmentTypes = computed(() => {
+    //return unique apartment types
+    return [
+        ...new Set(props.apartments.data.map((apartment) => apartment.type)),
+    ];
+});
+
+const amenitiesOptions = computed(() => {
+    //return unique amenities
+    return [
+        ...new Set(
+            props.apartments.data
+                .map((apartment) => apartment.amenities)
+                .flat()
+        ),
+    ];
+});
 </script>
 <template>
+    <!-- Filter Component -->
+    <div class="mb-8">
+        <FilterComponent
+            @updateFilters="applyFilters"
+            :apartmentTypes="apartmentTypes"
+            :amenities-options="amenitiesOptions"
+        />
+    </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div
             class="relative mx-auto w-full"
-            v-for="apartment in apartments.data"
-            :key="apartment.id"
+            v-for="apartment in filteredApartments"
         >
             <a
                 href="#"
@@ -79,7 +143,7 @@ const props = defineProps({
                         <span
                             class="absolute top-0 right-2 z-10 mt-3 ml-3 inline-flex select-none rounded-sm bg-[#1f93ff] px-2 py-1 text-xs font-semibold text-white"
                         >
-                            Residential
+                            {{ apartment.type }}
                         </span>
                         <span
                             class="absolute top-0 left-0 z-10 mt-3 ml-3 inline-flex select-none rounded-lg bg-transparent px-3 py-2 text-lg font-medium text-white"
