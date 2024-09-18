@@ -55,11 +55,22 @@ const amenitiesOptions = computed(() => {
     //return unique amenities
     return [
         ...new Set(
-            props.apartments.data
-                .map((apartment) => apartment.amenities)
-                .flat()
+            props.apartments.data.map((apartment) => apartment.amenities).flat()
         ),
     ];
+});
+
+const bedroomsNumber = computed(() => {
+    //return unique bedrooms in ascending order
+    return [
+        ...new Set(props.apartments.data.map((apartment) => apartment.bedrooms)),
+    ].sort((a, b) => a - b);
+});
+const bathroomsNumber = computed(() => {
+    //return unique bathrooms in ascending order
+    return [
+        ...new Set(props.apartments.data.map((apartment) => apartment.bathrooms)),
+    ].sort((a, b) => a - b);
 });
 </script>
 <template>
@@ -69,18 +80,20 @@ const amenitiesOptions = computed(() => {
             @updateFilters="applyFilters"
             :apartmentTypes="apartmentTypes"
             :amenities-options="amenitiesOptions"
+            :bedrooms-number="bedroomsNumber"
+            :bathrooms-number="bathroomsNumber"
         />
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         <div
             class="relative mx-auto w-full"
             v-for="apartment in filteredApartments"
         >
             <a
-                href="#"
+                href="https://www.google.com"
                 class="relative inline-block w-full transform transition-transform duration-300 ease-in-out hover:-translate-y-2"
             >
-                <div class="rounded-lg bg-white p-4 shadow">
+                <div class="rounded-lg bg-white shadow max-h-full h-[28.5rem]">
                     <div
                         class="relative flex h-52 justify-center overflow-hidden rounded-lg"
                     >
@@ -165,98 +178,104 @@ const amenitiesOptions = computed(() => {
                         </span>
                     </div>
 
-                    <div class="mt-4">
-                        <h2
-                            class="line-clamp-1 text-2xl font-medium text-gray-800 md:text-lg"
-                            title="New York"
-                        >
-                            {{ apartment.name }}
-                        </h2>
-
-                        <p
-                            class="text-primary mt-2 inline-block whitespace-nowrap rounded-xl font-semibold leading-tight"
-                        >
-                            <span class="text-sm uppercase"> OMR </span>
-                            <span class="text-2xl">{{ apartment.price }}</span
-                            >/month
-                        </p>
-                    </div>
-                    <div class="mt-4">
-                        <p class="line-clamp-1 mt-2 text-lg text-gray-800">
-                            {{ apartment.description }}
-                        </p>
-                    </div>
-                    <div class="justify-center">
-                        <div
-                            class="mt-4 flex space-x-6 overflow-hidden rounded-lg px-1 pt-4"
-                        >
-                            <p
-                                class="flex items-center font-medium text-gray-800"
+                    <div class="px-2 py-1">
+                        <div class="mt-2">
+                            <h2
+                                class="line-clamp-1 text-2xl font-medium text-gray-800 md:text-lg"
+                                title="New York"
                             >
-                                <font-awesome-layers full-width class="ml-2">
-                                    <font-awesome-icon
-                                        :icon="['fas', 'bed']"
-                                        class="text-teal-600"
-                                    />
-                                    <font-awesome-layers-text
-                                        value="5"
-                                        position="top-right"
-                                        transform="down-0 up-2 shrink-3"
-                                        class="text-orange-400 font-bold"
-                                    />
-                                </font-awesome-layers>
-                            </p>
+                                {{ apartment.name }}
+                            </h2>
 
                             <p
-                                class="flex items-center font-medium text-gray-800"
+                                class="text-primary mt-2 inline-block whitespace-nowrap rounded-xl font-semibold leading-tight"
                             >
-                                <font-awesome-layers full-width>
-                                    <font-awesome-icon
-                                        :icon="['fas', 'bath']"
-                                        class="text-teal-600"
-                                    />
-                                    <font-awesome-layers-text
-                                        :value="apartment.bathrooms"
-                                        position="top-right"
-                                        transform="down-0 up-2 shrink-3"
-                                        class="text-orange-400 font-bold"
-                                    />
-                                </font-awesome-layers>
-                            </p>
-                            <p
-                                class="flex items-center font-medium text-gray-800"
-                            >
-                                <font-awesome-layers full-width>
-                                    <font-awesome-icon
-                                        :icon="['fas', 'house']"
-                                        class="text-teal-600"
-                                    />
-                                    <font-awesome-layers-text
-                                        :value="`${apartment.area}sqm`"
-                                        position="top-right"
-                                        transform="down-0 up-2 shrink-3"
-                                        class="text-orange-400 font-bold"
-                                    />
-                                </font-awesome-layers>
-                                <!-- 2000 Yd<sup>2</sup> -->
+                                <span class="text-sm uppercase"> OMR </span>
+                                <span class="text-2xl">{{
+                                    apartment.price
+                                }}</span
+                                >/month
                             </p>
                         </div>
-                    </div>
-                    <div class="mt-8 grid grid-cols-2">
-                        <div class="flex items-center">
-                            <ul
-                                class="flex space-x-2"
-                                v-for="amenities in apartment.amenities"
+                        <div class="mt-4">
+                            <p class="line-clamp-1 mt-2 text-lg text-gray-800">
+                                {{ apartment.description }}
+                            </p>
+                        </div>
+                        <div class="justify-center">
+                            <div
+                                class="mt-4 flex space-x-6 overflow-hidden rounded-lg px-1 pt-4"
                             >
-                                <li
-                                    class="mx-1 px-1 text-sm text-gray-800 bg-slate-300/40 rounded shadow capitalize hover:bg-teal-500 hover:text-white"
+                                <p
+                                    class="flex items-center font-medium text-gray-800"
                                 >
-                                    <div>
+                                    <font-awesome-layers
+                                        full-width
+                                        class="ml-2"
+                                    >
+                                        <font-awesome-icon
+                                            :icon="['fas', 'bed']"
+                                            class="text-teal-600"
+                                        />
+                                        <font-awesome-layers-text
+                                            value="5"
+                                            position="top-right"
+                                            transform="down-0 up-2 shrink-3"
+                                            class="text-orange-400 font-bold"
+                                        />
+                                    </font-awesome-layers>
+                                </p>
+
+                                <p
+                                    class="flex items-center font-medium text-gray-800"
+                                >
+                                    <font-awesome-layers full-width>
+                                        <font-awesome-icon
+                                            :icon="['fas', 'bath']"
+                                            class="text-teal-600"
+                                        />
+                                        <font-awesome-layers-text
+                                            :value="apartment.bathrooms"
+                                            position="top-right"
+                                            transform="down-0 up-2 shrink-3"
+                                            class="text-orange-400 font-bold"
+                                        />
+                                    </font-awesome-layers>
+                                </p>
+                                <p
+                                    class="flex items-center font-medium text-gray-800"
+                                >
+                                    <font-awesome-layers full-width>
+                                        <font-awesome-icon
+                                            :icon="['fas', 'house']"
+                                            class="text-teal-600"
+                                        />
+                                        <font-awesome-layers-text
+                                            :value="`${apartment.area}sqm`"
+                                            position="top-right"
+                                            transform="down-0 up-2 shrink-3"
+                                            class="text-orange-400 font-bold"
+                                        />
+                                    </font-awesome-layers>
+                                    <!-- 2000 Yd<sup>2</sup> -->
+                                </p>
+                            </div>
+                        </div>
+                        <div class="mt-6 grid grid-cols-3 content-end">
+                            <div
+                                class="flex items-baseline justify-start flex-wrap gap-2 col-span-2"
+                            >
+                                <ul
+                                    class="flex overflow-ellipsis"
+                                    v-for="amenities in apartment.amenities"
+                                >
+                                    <li
+                                        class="mx-1 px-1 text-sm text-gray-800 bg-slate-300/40 rounded shadow capitalize hover:bg-teal-500 hover:text-white text-wrap"
+                                    >
                                         {{ amenities }}
-                                    </div>
-                                </li>
-                            </ul>
-                            <!-- <div class="relative">
+                                    </li>
+                                </ul>
+                                <!-- <div class="relative">
                                 <div
                                     class="h-6 w-6 rounded-full bg-gray-200 md:h-8 md:w-8"
                                 ></div>
@@ -268,19 +287,20 @@ const amenitiesOptions = computed(() => {
                             <p class="line-clamp-1 ml-2 text-gray-800">
                                 Salman Ghouri Dev
                             </p> -->
-                        </div>
+                            </div>
 
-                        <div class="flex justify-end space-x-2 items-center">
-                            <!-- <button
+                            <div class="flex justify-end items-baseline">
+                                <!-- <button
                                 class="flex items-center px-4 py-2 text-sm font-medium text-white bg-red-400 rounded-lg"
                             >
                                 View Details
                             </button> -->
-                            <button
-                                class="flex items-center px-4 py-2 text-sm font-medium text-white bg-teal-400 rounded-lg hover:bg-teal-500"
-                            >
-                                Book Now
-                            </button>
+                                <button
+                                    class="flex items-center px-4 py-2 text-sm font-medium text-white bg-teal-400 rounded-lg hover:bg-teal-500"
+                                >
+                                    Book Now
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
