@@ -8,6 +8,7 @@ export default defineConfig({
             input: 'resources/js/app.js',
             ssr: 'resources/js/ssr.js',
             refresh: true,
+            // detectTls: true
         }),
         vue({
             template: {
@@ -18,4 +19,10 @@ export default defineConfig({
             },
         }),
     ],
+    // server: {
+    //     host: 'jbr.test',
+    //     hmr: {
+    //         host: 'jbr.test',
+    //     },
+    // },
 });
