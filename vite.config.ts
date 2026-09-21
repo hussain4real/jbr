@@ -3,7 +3,7 @@ import { wayfinder } from '@laravel/vite-plugin-wayfinder';
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import laravel from 'laravel-vite-plugin';
-import { bunny } from 'laravel-vite-plugin/fonts';
+import { bunny, google } from 'laravel-vite-plugin/fonts';
 import { defineConfig, lazyPlugins } from 'vite-plus';
 
 export default defineConfig({
@@ -12,12 +12,35 @@ export default defineConfig({
             input: ['resources/css/app.css', 'resources/js/app.ts'],
             refresh: true,
             fonts: [
+                google('El Messiri', {
+                    subsets: ['latin', 'arabic'],
+                    preload: false,
+                    optimizedFallbacks: false,
+                    weights: [400, 600],
+                }),
+                google('Noto Sans', {
+                    preload: false,
+                    optimizedFallbacks: false,
+                    weights: [400, 500, 600],
+                }),
+                google('Noto Sans Arabic', {
+                    subsets: ['latin', 'arabic'],
+                    preload: false,
+                    optimizedFallbacks: false,
+                    weights: [400, 500, 600],
+                }),
                 bunny('Instrument Sans', {
+                    preload: false,
+                    optimizedFallbacks: false,
                     weights: [400, 500, 600],
                 }),
             ],
         }),
-        inertia(),
+        inertia({
+            ssr: {
+                host: '127.0.0.1',
+            },
+        }),
         tailwindcss(),
         vue({
             template: {
