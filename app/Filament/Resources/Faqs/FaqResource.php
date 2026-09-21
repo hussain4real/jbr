@@ -5,13 +5,17 @@ namespace App\Filament\Resources\Faqs;
 use App\Filament\ContentEditor;
 use App\Filament\Resources\Faqs\Pages\ManageFaqs;
 use App\Models\Faq;
+use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class FaqResource extends Resource
 {
     protected static ?string $model = Faq::class;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedQuestionMarkCircle;
 
     public static function form(Schema $schema): Schema
     {

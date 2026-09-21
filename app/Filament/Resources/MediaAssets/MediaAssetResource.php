@@ -6,18 +6,22 @@ use App\Filament\ContentEditor;
 use App\Filament\Resources\MediaAssets\Pages\ManageMediaAssets;
 use App\Jobs\ProcessWebsiteImage;
 use App\Models\MediaAsset;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class MediaAssetResource extends Resource
 {
     protected static ?string $model = MediaAsset::class;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPhoto;
 
     public static function form(Schema $schema): Schema
     {
