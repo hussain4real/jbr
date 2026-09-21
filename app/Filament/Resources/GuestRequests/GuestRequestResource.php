@@ -6,6 +6,7 @@ use App\Filament\Resources\GuestRequests\Pages\ManageGuestRequests;
 use App\Jobs\DeliverGuestRequestNotification;
 use App\Models\GuestRequest;
 use App\Models\User;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
@@ -15,6 +16,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -25,6 +27,8 @@ use Illuminate\Support\Facades\Gate;
 class GuestRequestResource extends Resource
 {
     protected static ?string $model = GuestRequest::class;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedInboxStack;
 
     protected static ?string $navigationLabel = 'Guest inbox';
 

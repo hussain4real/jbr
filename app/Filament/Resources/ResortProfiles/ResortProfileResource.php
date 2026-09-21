@@ -6,17 +6,21 @@ use App\Filament\ContentEditor;
 use App\Filament\Resources\ResortProfiles\Pages\ManageResortProfiles;
 use App\Models\MediaAsset;
 use App\Models\ResortProfile;
+use BackedEnum;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class ResortProfileResource extends Resource
 {
     protected static ?string $model = ResortProfile::class;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedPencilSquare;
 
     protected static ?string $navigationLabel = 'Website content';
 
