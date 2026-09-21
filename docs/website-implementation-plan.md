@@ -374,3 +374,19 @@ Remaining work: have staff sign in, enrol MFA and complete/publish bilingual con
 Reference: [Google's DKIM setup and verification guidance](https://knowledge.workspace.google.com/admin/security/set-up-dkim). A saved signing setting alone is not proof that a received message passes DKIM; recipient headers provide that evidence.
 
 For delivery interpretation, [Google distinguishes processing events from post-delivery mailbox status](https://knowledge.workspace.google.com/admin/gmail/advanced/email-log-search-delivery-status-definitions). Inspect both before reporting Inbox or Spam-folder placement.
+
+### GitHub continuous deployment — 21 September 2026
+
+The development branch is `dev`. Promote changes through a pull request from `dev` into `main`, using a merge commit so the long-lived branches retain their shared history. `main` requires the `ci` check, an up-to-date PR and resolved conversations; force pushes and deletion are blocked. A second person's approval is not mandatory for this single-maintainer workflow.
+
+The workflow at `.github/workflows/tests.yml` runs on pushes to `dev`/`main` and pull requests. It installs locked dependencies, builds client and SSR assets, runs the full existing checks, and validates the deployment scripts. After successful main-branch CI, it checks GitHub's associated-PR API for a merged PR whose merge SHA equals the tested commit. Direct pushes and obsolete commits do not deploy. This follows the [GitHub commit/PR association API](https://docs.github.com/en/rest/commits/commits#list-pull-requests-associated-with-a-commit).
+
+Deployment uses the `preview` GitHub environment, restricted to the `main` branch, with `DEPLOY_SSH_KEY` as its sole secret. `DEPLOY_HOST`, `DEPLOY_USER` and the verified `DEPLOY_KNOWN_HOSTS` are environment variables. The dedicated `jbr-deploy` SSH identity accepts only `deploy <commit SHA>` through a forced command. It cannot open an interactive shell or forward connections. The owner's administrator key and the application's `.env` are not stored in GitHub.
+
+Root-owned server commands are installed from `.github/deploy/`: `ssh-command.sh` at `/usr/local/bin/jbr-github-deploy`, `deploy.sh` at `/usr/local/bin/jbr-deploy`, and `services.sh` at `/usr/local/sbin/jbr-services`. Future changes to these three files require the server administrator to reinstall them; application deployments cannot replace these privileged entry points. The deployment account can run only the deployer as `jbr`; the application user can stop/start only its own queue and SSR services through the fixed service helper, which also reloads PHP-FPM.
+
+Each deployment fetches the exact tested public GitHub commit into a new release directory. Composer and npm install locked dependencies; client/SSR builds and Laravel caches complete before maintenance mode. `.env`, SQLite and uploaded media remain in `/var/www/jbr/shared`. A GitHub concurrency group and server file lock serialize releases. The deployer rechecks main before activation, stops workers, applies forward migrations, atomically switches `/var/www/jbr/current`, then starts services and verifies SSR plus English/Arabic responses. `REVISION` in the release and `shared/deployed-revision` identify the healthy deployed SHA.
+
+On an activation or health-check failure, the deployer restores the prior application symlink and services. It does not reverse database migrations: schema changes must remain compatible with the previous release. Existing releases are retained for administrator recovery. To retry a failed deployment, rerun its GitHub Actions run while that commit is still main's current head; otherwise merge a corrective PR. Deployment scripts do not seed content, provision staff, change DNS or modify launch switches.
+
+The current target remains the protected `preview.jauharat.com` site. Automatic deployments do not constitute public launch or UAT approval.
