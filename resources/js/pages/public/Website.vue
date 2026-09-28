@@ -119,11 +119,16 @@ const navigation = computed(() => [
         active: props.page === 'contact',
     },
 ]);
+const requestLabel = computed(() =>
+    text(props.acceptsRequests ? 'actions_booking' : 'actions_contact'),
+);
 const requestLink = (stay?: Accommodation): string =>
-    routes.booking(
-        props.locale,
-        stay ? { query: { accommodation: stay.id } } : undefined,
-    ).url;
+    props.acceptsRequests
+        ? routes.booking(
+              props.locale,
+              stay ? { query: { accommodation: stay.id } } : undefined,
+          ).url
+        : routes.contact(props.locale).url;
 const description = computed(
     () =>
         props.stay?.description ||
@@ -268,7 +273,7 @@ const structuredData = computed(() =>
                 <Link
                     :href="requestLink()"
                     class="resort-button hidden sm:inline-flex"
-                    >{{ text('actions_booking')
+                    >{{ requestLabel
                     }}<ArrowUpRight
                         class="size-4 rtl:-scale-x-100"
                         aria-hidden="true"
@@ -305,7 +310,7 @@ const structuredData = computed(() =>
                 :href="requestLink()"
                 class="resort-link"
                 @click="menu = false"
-                >{{ text('actions_booking') }}</Link
+                >{{ requestLabel }}</Link
             >
         </nav>
         <main id="main" tabindex="-1">
@@ -461,7 +466,7 @@ const structuredData = computed(() =>
                         <Link
                             :href="requestLink()"
                             class="resort-button inverse"
-                            >{{ text('actions_booking')
+                            >{{ requestLabel
                             }}<ArrowUpRight
                                 class="size-5 rtl:-scale-x-100"
                                 aria-hidden="true"
@@ -480,7 +485,13 @@ const structuredData = computed(() =>
                         {{ text('gallery_description') }}
                     </p>
                     <p v-if="page === 'booking' || page === 'contact'">
-                        {{ text('requests_description') }}
+                        {{
+                            text(
+                                acceptsRequests
+                                    ? 'requests_description'
+                                    : 'contact_description',
+                            )
+                        }}
                     </p>
                 </section>
                 <section
@@ -592,7 +603,7 @@ const structuredData = computed(() =>
                             <Link
                                 :href="requestLink(stay)"
                                 class="resort-button"
-                                >{{ text('actions_booking') }}</Link
+                                >{{ requestLabel }}</Link
                             ><Link
                                 :href="routes.contact(locale)"
                                 class="resort-link"

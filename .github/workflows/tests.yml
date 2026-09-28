@@ -91,7 +91,7 @@ jobs:
     timeout-minutes: 25
     environment:
       name: preview
-      url: https://preview.jauharat.com
+      url: https://jauharat.com
     concurrency:
       group: jbr-preview-deployment
       cancel-in-progress: false
@@ -115,4 +115,4 @@ jobs:
             -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$hosts_file" \
             -o ConnectTimeout=20 -o ServerAliveInterval=15 -o ServerAliveCountMax=4 \
             "$DEPLOY_USER@$DEPLOY_HOST" "deploy $GITHUB_SHA"
-          echo "Deployed commit $GITHUB_SHA to the protected preview." >> "$GITHUB_STEP_SUMMARY"
+          echo "Deployed commit $GITHUB_SHA to jauharat.com." >> "$GITHUB_STEP_SUMMARY"

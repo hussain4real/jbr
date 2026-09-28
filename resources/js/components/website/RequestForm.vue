@@ -65,12 +65,7 @@ function submit(): void {
 <template>
     <form class="resort-form" novalidate @submit.prevent="submit">
         <div v-if="!enabled" class="resort-notice" role="status">
-            {{
-                systemText(
-                    'Online requests are not open yet. Please check back soon.',
-                    'طلبات الحجز والاستفسارات الإلكترونية غير متاحة حالياً. يرجى زيارة الموقع لاحقاً.',
-                )
-            }}
+            {{ text('form_contact_directly') }}
         </div>
         <div
             v-if="messages.length || connectionError"
@@ -101,7 +96,7 @@ function submit(): void {
                 }}
             </p>
         </div>
-        <fieldset :disabled="!enabled" class="grid gap-6 disabled:opacity-65">
+        <fieldset v-if="enabled" class="grid gap-6">
             <legend class="sr-only">
                 {{
                     booking
