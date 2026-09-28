@@ -177,42 +177,52 @@
     --color-resort-gold: #9b895b;
 }
 
-.resort-site {
+.resort-site,
+.resort-lightbox {
+    --resort-paper: #f3dac3;
     --resort-ink: #173e35;
     --resort-muted: #536660;
-    --resort-surface: #fff;
-    --resort-soft: #f0f5f3;
-    --resort-line: #d7e0dc;
-    --background: #fff;
-    --foreground: #173e35;
+    --resort-surface: var(--resort-paper);
+    --resort-soft: #f7e4d2;
+    --resort-line: #cbb394;
+    --background: var(--resort-surface);
+    --foreground: var(--resort-ink);
+    --muted-foreground: var(--resort-muted);
+    --border: var(--resort-line);
+    --accent: var(--resort-soft);
+    --accent-foreground: var(--resort-ink);
     --primary: #276a70;
     --primary-foreground: #fff;
-    --input: #a9bbb3;
+    --input: #85735d;
     --ring: #276a70;
     --destructive: #b42318;
     background: var(--resort-surface);
     color: var(--resort-ink);
     font-family: 'Noto Sans', 'Noto Sans Arabic', sans-serif;
+}
+.resort-site {
     font-size: 15px;
     line-height: 1.65;
     min-height: 100dvh;
 }
-.resort-site[dir='rtl'] {
+.resort-site[dir='rtl'],
+.resort-lightbox[dir='rtl'] {
     font-family: 'Noto Sans Arabic', 'Noto Sans', sans-serif;
 }
-.dark .resort-site {
+.dark .resort-site,
+.dark .resort-lightbox {
     --resort-ink: #e7efeb;
     --resort-muted: #b3c8be;
     --resort-surface: #12271f;
     --resort-soft: #1a352a;
     --resort-line: #3c574a;
-    --background: #12271f;
-    --foreground: #e7efeb;
     --input: #789788;
+    --ring: #6b9ea1;
     --destructive: #ffa49e;
 }
-.resort-site :focus-visible {
-    outline: 3px solid #6b9ea1;
+.resort-site :focus-visible,
+.resort-lightbox :focus-visible {
+    outline: 3px solid var(--ring);
     outline-offset: 4px;
 }
 .resort-wrap {
@@ -233,7 +243,7 @@
     inset-inline-start: 20px;
     z-index: 100;
     padding: 12px 20px;
-    background: #fff;
+    background: var(--resort-paper);
     color: #173e35;
 }
 .resort-skip:focus {
@@ -305,7 +315,7 @@
     background: #194e52;
 }
 .resort-button.inverse {
-    background: #fff;
+    background: var(--resort-paper);
     color: #173e35;
 }
 .resort-button:disabled {
@@ -481,7 +491,7 @@
     inset-inline-start: 17px;
     font-size: 12px;
     padding: 3px 9px;
-    background: #fff;
+    background: var(--resort-paper);
     color: #173e35;
 }
 .stay-heading {
@@ -634,7 +644,7 @@
     background: var(--resort-surface);
     color: var(--resort-ink);
     min-height: 48px;
-    border: 1px solid var(--resort-line);
+    border: 1px solid var(--input);
     border-radius: 2px;
     padding: 10px 12px;
     font: inherit;
@@ -756,9 +766,6 @@
     gap: 20px;
     font-size: 10px;
     color: var(--resort-muted);
-}
-.resort-lightbox {
-    font-family: 'Noto Sans', 'Noto Sans Arabic', sans-serif;
 }
 @media (max-width: 1100px) {
     .resort-wrap {
