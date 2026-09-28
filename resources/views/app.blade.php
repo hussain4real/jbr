@@ -31,8 +31,8 @@
         </style>
 
         @if (! isset($page['props']['branding']))
-            <link rel="icon" href="/images/jbr-logo-on-white.png" type="image/png">
-            <link rel="apple-touch-icon" href="/images/jbr-logo-on-white.png">
+            <link rel="icon" href="/images/image.png" type="image/png">
+            <link rel="apple-touch-icon" href="/images/image.png">
         @endif
 
         @fonts

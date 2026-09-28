@@ -149,12 +149,12 @@ const structuredData = computed(() =>
         <Head :title="page === 'home' ? brand : titles[page] + ' — ' + brand">
             <link
                 rel="icon"
-                :href="branding.light?.src ?? '/images/jbr-logo-on-white.png'"
+                :href="branding.light?.src ?? '/images/image.png'"
                 head-key="icon"
             />
             <link
                 rel="apple-touch-icon"
-                :href="branding.light?.src ?? '/images/jbr-logo-on-white.png'"
+                :href="branding.light?.src ?? '/images/image.png'"
                 head-key="touch-icon"
             />
             <meta
@@ -231,17 +231,15 @@ const structuredData = computed(() =>
                 class="brand"
                 :aria-label="brand + ' — ' + text('accessibility_home')"
                 ><img
-                    :src="
-                        branding.light?.src ?? '/images/jbr-logo-on-white.png'
-                    "
+                    :src="branding.light?.src ?? '/images/image.png'"
                     class="resort-logo-light"
-                    :width="branding.light?.width ?? 1053"
-                    :height="branding.light?.height ?? 870"
+                    :width="branding.light?.width ?? 469"
+                    :height="branding.light?.height ?? 296"
                     :alt="brand" /><img
-                    :src="branding.dark?.src ?? '/images/jbr-logo-on-green.png'"
+                    :src="branding.dark?.src ?? '/images/image.png'"
                     class="resort-logo-dark"
-                    :width="branding.dark?.width ?? 1053"
-                    :height="branding.dark?.height ?? 870"
+                    :width="branding.dark?.width ?? 469"
+                    :height="branding.dark?.height ?? 296"
                     :alt="brand"
             /></Link>
             <nav
@@ -358,24 +356,18 @@ const structuredData = computed(() =>
                     </figure>
                     <div v-else class="brand-panel" aria-hidden="true">
                         <img
-                            :src="
-                                branding.light?.src ??
-                                '/images/jbr-logo-on-white.png'
-                            "
+                            :src="branding.light?.src ?? '/images/image.png'"
                             class="resort-logo-light"
                             alt=""
-                            :width="branding.light?.width ?? 1053"
-                            :height="branding.light?.height ?? 870"
+                            :width="branding.light?.width ?? 469"
+                            :height="branding.light?.height ?? 296"
                         />
                         <img
-                            :src="
-                                branding.dark?.src ??
-                                '/images/jbr-logo-on-green.png'
-                            "
+                            :src="branding.dark?.src ?? '/images/image.png'"
                             class="resort-logo-dark"
                             alt=""
-                            :width="branding.dark?.width ?? 1053"
-                            :height="branding.dark?.height ?? 870"
+                            :width="branding.dark?.width ?? 469"
+                            :height="branding.dark?.height ?? 296"
                         />
                     </div>
                 </section>

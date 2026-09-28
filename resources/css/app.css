@@ -248,17 +248,15 @@
     border-bottom: 1px solid var(--resort-line);
 }
 .brand {
-    width: 128px;
+    width: 160px;
     flex-shrink: 0;
 }
 .brand img {
     display: block;
     width: 100%;
     height: auto;
-    mix-blend-mode: multiply;
 }
 .dark .brand img {
-    mix-blend-mode: normal;
     border-radius: 4px;
 }
 .brand .resort-logo-dark,
@@ -802,7 +800,7 @@
         gap: 15px;
     }
     .brand {
-        width: 100px;
+        width: 132px;
     }
     .home-hero {
         grid-template-columns: 1fr;
