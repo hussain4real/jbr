@@ -119,11 +119,20 @@ const navigation = computed(() => [
         active: props.page === 'contact',
     },
 ]);
+const hasContacts = computed(
+    () => !!(props.profile.phone || props.profile.email),
+);
+const contactOnly = computed(() => !props.acceptsRequests && hasContacts.value);
+const requestLabel = computed(() =>
+    text(contactOnly.value ? 'actions_contact' : 'actions_booking'),
+);
 const requestLink = (stay?: Accommodation): string =>
-    routes.booking(
-        props.locale,
-        stay ? { query: { accommodation: stay.id } } : undefined,
-    ).url;
+    contactOnly.value
+        ? routes.contact(props.locale).url
+        : routes.booking(
+              props.locale,
+              stay ? { query: { accommodation: stay.id } } : undefined,
+          ).url;
 const description = computed(
     () =>
         props.stay?.description ||
@@ -268,7 +277,7 @@ const structuredData = computed(() =>
                 <Link
                     :href="requestLink()"
                     class="resort-button hidden sm:inline-flex"
-                    >{{ text('actions_booking')
+                    >{{ requestLabel
                     }}<ArrowUpRight
                         class="size-4 rtl:-scale-x-100"
                         aria-hidden="true"
@@ -305,7 +314,7 @@ const structuredData = computed(() =>
                 :href="requestLink()"
                 class="resort-link"
                 @click="menu = false"
-                >{{ text('actions_booking') }}</Link
+                >{{ requestLabel }}</Link
             >
         </nav>
         <main id="main" tabindex="-1">
@@ -461,7 +470,7 @@ const structuredData = computed(() =>
                         <Link
                             :href="requestLink()"
                             class="resort-button inverse"
-                            >{{ text('actions_booking')
+                            >{{ requestLabel
                             }}<ArrowUpRight
                                 class="size-5 rtl:-scale-x-100"
                                 aria-hidden="true"
@@ -480,7 +489,15 @@ const structuredData = computed(() =>
                         {{ text('gallery_description') }}
                     </p>
                     <p v-if="page === 'booking' || page === 'contact'">
-                        {{ text('requests_description') }}
+                        {{
+                            text(
+                                acceptsRequests
+                                    ? 'requests_description'
+                                    : hasContacts
+                                      ? 'contact_description'
+                                      : 'form_requests_closed',
+                            )
+                        }}
                     </p>
                 </section>
                 <section
@@ -592,7 +609,7 @@ const structuredData = computed(() =>
                             <Link
                                 :href="requestLink(stay)"
                                 class="resort-button"
-                                >{{ text('actions_booking') }}</Link
+                                >{{ requestLabel }}</Link
                             ><Link
                                 :href="routes.contact(locale)"
                                 class="resort-link"
@@ -742,6 +759,7 @@ const structuredData = computed(() =>
                         :selected="selectedAccommodation"
                         :today="today"
                         :enabled="acceptsRequests"
+                        :has-contacts="hasContacts"
                         :has-privacy="!!profile.privacy"
                     />
                     <aside class="request-aside">
