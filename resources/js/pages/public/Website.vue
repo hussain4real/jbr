@@ -119,16 +119,20 @@ const navigation = computed(() => [
         active: props.page === 'contact',
     },
 ]);
+const hasContacts = computed(
+    () => !!(props.profile.phone || props.profile.email),
+);
+const contactOnly = computed(() => !props.acceptsRequests && hasContacts.value);
 const requestLabel = computed(() =>
-    text(props.acceptsRequests ? 'actions_booking' : 'actions_contact'),
+    text(contactOnly.value ? 'actions_contact' : 'actions_booking'),
 );
 const requestLink = (stay?: Accommodation): string =>
-    props.acceptsRequests
-        ? routes.booking(
+    contactOnly.value
+        ? routes.contact(props.locale).url
+        : routes.booking(
               props.locale,
               stay ? { query: { accommodation: stay.id } } : undefined,
-          ).url
-        : routes.contact(props.locale).url;
+          ).url;
 const description = computed(
     () =>
         props.stay?.description ||
@@ -489,7 +493,9 @@ const structuredData = computed(() =>
                             text(
                                 acceptsRequests
                                     ? 'requests_description'
-                                    : 'contact_description',
+                                    : hasContacts
+                                      ? 'contact_description'
+                                      : 'form_requests_closed',
                             )
                         }}
                     </p>
@@ -753,6 +759,7 @@ const structuredData = computed(() =>
                         :selected="selectedAccommodation"
                         :today="today"
                         :enabled="acceptsRequests"
+                        :has-contacts="hasContacts"
                         :has-privacy="!!profile.privacy"
                     />
                     <aside class="request-aside">

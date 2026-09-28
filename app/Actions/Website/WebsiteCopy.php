@@ -81,6 +81,7 @@ class WebsiteCopy
             'form_booking_legend' => ['en' => 'Booking request details', 'ar' => 'بيانات طلب الحجز'],
             'form_enquiry_legend' => ['en' => 'Enquiry details', 'ar' => 'بيانات الاستفسار'],
             'form_contact_directly' => ['en' => 'For enquiries and booking requests, please contact our reservations team by phone or email using the details on this page.', 'ar' => 'للاستفسارات وطلبات الحجز، يرجى التواصل مع فريق الحجوزات هاتفياً أو عبر البريد الإلكتروني باستخدام بيانات التواصل في هذه الصفحة.'],
+            'form_requests_closed' => ['en' => 'Online requests are not open yet. Please check back soon.', 'ar' => 'طلبات الحجز والاستفسارات الإلكترونية غير متاحة حالياً. يرجى زيارة الموقع لاحقاً.'],
             'form_accommodation' => ['en' => 'Accommodation preference', 'ar' => 'الإقامة المفضلة'],
             'form_choose' => ['en' => 'Help me choose', 'ar' => 'ساعدوني في الاختيار'],
             'form_arrival' => ['en' => 'Arrival date', 'ar' => 'تاريخ الوصول'],

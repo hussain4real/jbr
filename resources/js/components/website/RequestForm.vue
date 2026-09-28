@@ -20,6 +20,7 @@ const props = defineProps<{
     selected: string | null;
     today: string;
     enabled: boolean;
+    hasContacts: boolean;
     hasPrivacy: boolean;
 }>();
 const ar = computed(() => props.locale === 'ar');
@@ -65,7 +66,13 @@ function submit(): void {
 <template>
     <form class="resort-form" novalidate @submit.prevent="submit">
         <div v-if="!enabled" class="resort-notice" role="status">
-            {{ text('form_contact_directly') }}
+            {{
+                text(
+                    hasContacts
+                        ? 'form_contact_directly'
+                        : 'form_requests_closed',
+                )
+            }}
         </div>
         <div
             v-if="messages.length || connectionError"
