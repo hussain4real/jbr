@@ -20,6 +20,12 @@ export interface Accommodation {
     images: ResortImage[];
     published: boolean;
 }
+export interface ResortPromotion {
+    title: string;
+    description: string;
+    image: ResortImage;
+    downloadUrl: string;
+}
 export interface ResortProfile {
     introduction: string;
     address: string;

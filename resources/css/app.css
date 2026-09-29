@@ -507,6 +507,65 @@
 .resort-muted {
     color: var(--resort-muted);
 }
+.resort-promotion {
+    display: grid;
+    grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(40px, 7vw, 100px);
+    padding-block: 80px;
+    border-top: 1px solid var(--resort-line);
+}
+.promotion-poster {
+    display: block;
+    text-align: start;
+    cursor: zoom-in;
+}
+.promotion-poster img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+.promotion-poster span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px;
+    background: var(--resort-soft);
+    font-size: 13px;
+}
+.promotion-copy h2 {
+    max-width: 20ch;
+}
+.promotion-description {
+    max-width: 55ch;
+    margin-block: 24px 32px;
+    color: var(--resort-muted);
+    white-space: pre-line;
+}
+.promotion-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+.resort-lightbox .promotion-enlarged {
+    max-height: none;
+}
+@media (max-width: 767px) {
+    .resort-promotion {
+        grid-template-columns: 1fr;
+        gap: 32px;
+        padding-block: 48px;
+    }
+    .promotion-copy {
+        grid-row: 1;
+    }
+    .promotion-poster {
+        width: min(100%, 420px);
+        margin-inline: auto;
+    }
+}
 .stay-invitation {
     display: flex;
     justify-content: space-between;

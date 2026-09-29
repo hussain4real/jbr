@@ -8,6 +8,8 @@ import {
     X,
     MapPin,
     ArrowRight,
+    Download,
+    Expand,
 } from '@lucide/vue';
 import { computed, ref, watch } from 'vue';
 import { Button } from '@/components/ui/button';
@@ -26,6 +28,7 @@ import type {
     Locale,
     ResortImage,
     ResortProfile,
+    ResortPromotion,
     WebsitePage,
 } from '@/types/website';
 const props = defineProps<{
@@ -34,6 +37,7 @@ const props = defineProps<{
     page: WebsitePage;
     profile: ResortProfile;
     hero: ResortImage | null;
+    promotion: ResortPromotion | null;
     branding: { light: ResortImage | null; dark: ResortImage | null };
     media: ResortImage[];
     accommodations: Accommodation[];
@@ -378,6 +382,62 @@ const structuredData = computed(() =>
                             :width="branding.dark?.width ?? 469"
                             :height="branding.dark?.height ?? 296"
                         />
+                    </div>
+                </section>
+                <section
+                    v-if="promotion"
+                    class="resort-promotion resort-wrap"
+                    aria-labelledby="promotion-title"
+                >
+                    <button
+                        type="button"
+                        class="promotion-poster"
+                        :aria-label="text('promotion_enlarge')"
+                        @click="lightbox = promotion.image"
+                    >
+                        <img
+                            :src="promotion.image.src"
+                            :srcset="promotion.image.srcset"
+                            sizes="(min-width: 768px) 420px, calc(100vw - 40px)"
+                            :width="promotion.image.width"
+                            :height="promotion.image.height"
+                            :alt="promotion.image.alt"
+                            loading="lazy"
+                            decoding="async"
+                        />
+                        <span
+                            ><Expand class="size-4" aria-hidden="true" />{{
+                                text('promotion_enlarge')
+                            }}</span
+                        >
+                    </button>
+                    <div class="promotion-copy">
+                        <p class="eyebrow">{{ text('promotion_label') }}</p>
+                        <h2 id="promotion-title">{{ promotion.title }}</h2>
+                        <p class="promotion-description">
+                            {{ promotion.description }}
+                        </p>
+                        <div class="promotion-actions">
+                            <Link
+                                :href="routes.contact(locale)"
+                                class="resort-button"
+                            >
+                                {{ text('actions_enquiry')
+                                }}<ArrowUpRight
+                                    class="size-4 rtl:-scale-x-100"
+                                    aria-hidden="true"
+                                />
+                            </Link>
+                            <a
+                                :href="promotion.downloadUrl"
+                                class="resort-link"
+                                download
+                            >
+                                <Download class="size-4" aria-hidden="true" />{{
+                                    text('promotion_download')
+                                }}
+                            </a>
+                        </div>
                     </div>
                 </section>
                 <section
@@ -948,6 +1008,10 @@ const structuredData = computed(() =>
                     :width="lightbox.width"
                     :height="lightbox.height"
                     class="max-h-[75dvh] w-full object-contain"
+                    :class="{
+                        'promotion-enlarged':
+                            lightbox.id === promotion?.image.id,
+                    }"
                 /><DialogDescription>{{
                     lightbox.alt
                 }}</DialogDescription></DialogContent
