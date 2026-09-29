@@ -4,11 +4,13 @@ namespace App\Models;
 
 use App\Actions\Website\WebsiteCopy;
 use App\Concerns\PublishesWebsiteContent;
+use Closure;
 use Database\Factories\ResortProfileFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 /**
@@ -37,7 +39,21 @@ class ResortProfile extends Model
             'logo_dark_media_id' => ['nullable', Rule::exists('media_assets', 'id')->whereNotNull('published_at')],
             'requests_enabled' => 'boolean', 'privacy_approved' => 'boolean', 'operations_approved' => 'boolean',
             'retention_days' => 'nullable|integer|min:1|max:3650',
+            'promotion_enabled' => 'boolean',
+            'promotion_title.en' => 'nullable|string|max:200', 'promotion_title.ar' => 'nullable|string|max:200',
+            'promotion_description.en' => 'nullable|string|max:2500', 'promotion_description.ar' => 'nullable|string|max:2500',
+            'promotion_media_id' => ['nullable', Rule::exists('media_assets', 'id')->whereNotNull('published_at')],
+            'promotion_pdf_path' => ['nullable', 'string', 'max:255', function (string $attribute, mixed $value, Closure $fail): void {
+                if ($this->promotionPdfPath(true) === null) {
+                    $fail('Upload a valid promotion PDF of up to 10 MB.');
+                }
+            }],
         ];
+        if ($this->draft['promotion_enabled'] ?? false) {
+            foreach (['promotion_title.en', 'promotion_title.ar', 'promotion_description.en', 'promotion_description.ar', 'promotion_media_id', 'promotion_pdf_path'] as $field) {
+                $rules[$field] = is_array($rules[$field]) ? ['required', ...$rules[$field]] : 'required|'.$rules[$field];
+            }
+        }
         $copy = is_array($this->draft['copy'] ?? null) ? $this->draft['copy'] : [];
         $rules['copy'] = 'sometimes|array:'.implode(',', array_keys(WebsiteCopy::defaults()));
         foreach (WebsiteCopy::defaults() as $key => $translations) {
@@ -71,5 +87,19 @@ class ResortProfile extends Model
         }
 
         return $rules;
+    }
+
+    public function promotionPdfPath(bool $draft = false): ?string
+    {
+        $path = ($draft ? $this->draft : $this->published)['promotion_pdf_path'] ?? null;
+        if (! is_string($path) || ! preg_match('~^website/promotions/[a-zA-Z0-9_-]+\.pdf$~D', $path)) {
+            return null;
+        }
+        $disk = Storage::disk('local');
+        if (! $disk->exists($path) || $disk->mimeType($path) !== 'application/pdf' || $disk->size($path) > 10 * 1024 * 1024) {
+            return null;
+        }
+
+        return $path;
     }
 }

@@ -3,12 +3,14 @@
 use App\Http\Controllers\GuestRequestController;
 use App\Http\Controllers\WebsiteController;
 use App\Http\Controllers\WebsiteMediaController;
+use App\Http\Controllers\WebsitePromotionController;
 use App\Http\Middleware\SetWebsiteLocale;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/en')->name('home');
 Route::get('/sitemap.xml', [WebsiteController::class, 'sitemap'])->name('website.sitemap');
 Route::get('/website-media/{asset}/{size}/{version}', WebsiteMediaController::class)->whereNumber('asset')->whereIn('size', ['480', '960', '1600'])->name('website.media');
+Route::get('/website-promotion/{profile}/{version}', WebsitePromotionController::class)->whereNumber('profile')->where('version', '[a-f0-9]{16}')->name('website.promotion');
 
 Route::prefix('{locale}')->where(['locale' => 'en|ar'])->middleware(SetWebsiteLocale::class)->name('website.')->group(function (): void {
     Route::get('/', [WebsiteController::class, 'page'])->defaults('page', 'home')->name('home');

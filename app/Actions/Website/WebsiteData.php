@@ -51,7 +51,7 @@ class WebsiteData
         $profile = ($preview instanceof ResortProfile ? $preview->draft : ($localPreview ? $profileRecord?->draft : $profileRecord?->published)) ?? [];
         $previewMediaIds = match (true) {
             $preview instanceof Accommodation => $preview->draft['media_ids'] ?? [],
-            $preview instanceof ResortProfile => [$preview->draft['hero_media_id'] ?? null, $preview->draft['logo_light_media_id'] ?? null, $preview->draft['logo_dark_media_id'] ?? null],
+            $preview instanceof ResortProfile => [$preview->draft['hero_media_id'] ?? null, $preview->draft['logo_light_media_id'] ?? null, $preview->draft['logo_dark_media_id'] ?? null, $preview->draft['promotion_media_id'] ?? null],
             default => [],
         };
         $media = [];
@@ -78,7 +78,20 @@ class WebsiteData
         }
         uasort($media, fn (array $a, array $b): int => [$a['order'], $a['id']] <=> [$b['order'], $b['id']]);
         $logoIds = array_filter([$profile['logo_light_media_id'] ?? null, $profile['logo_dark_media_id'] ?? null]);
-        $gallery = array_diff_key($media, array_flip($logoIds));
+        $gallery = array_diff_key($media, array_flip([...$logoIds, $profile['promotion_media_id'] ?? 0]));
+        $promotion = null;
+        $promotionProfile = $preview instanceof ResortProfile ? $preview : $profileRecord;
+        $promotionImage = $media[$profile['promotion_media_id'] ?? 0] ?? null;
+        $isPromotionPreview = $localPreview || $preview instanceof ResortProfile;
+        if (($profile['promotion_enabled'] ?? false) && $promotionImage && ($pdfPath = $promotionProfile?->promotionPdfPath($isPromotionPreview))) {
+            $params = ['profile' => $promotionProfile->id, 'version' => substr(hash('sha256', $pdfPath), 0, 16)];
+            $promotion = [
+                'title' => data_get($profile, 'promotion_title.'.$locale, ''),
+                'description' => data_get($profile, 'promotion_description.'.$locale, ''),
+                'image' => $promotionImage,
+                'downloadUrl' => $isPromotionPreview ? URL::temporarySignedRoute('website.promotion', now()->addHour(), [...$params, 'preview' => 1]) : route('website.promotion', $params),
+            ];
+        }
         $accommodations = [];
         foreach (Accommodation::query()->orderBy('id')->get() as $record) {
             $content = ($localPreview || ($preview instanceof Accommodation && $preview->is($record))) ? $record->draft : $record->published;
@@ -110,6 +123,7 @@ class WebsiteData
         return [
             'locale' => $locale, 'isPreview' => $preview !== null || $localPreview,
             'copy' => WebsiteCopy::forLocale($profile, $locale),
+            'promotion' => $promotion,
             'branding' => [
                 'light' => $media[$profile['logo_light_media_id'] ?? 0] ?? null,
                 'dark' => $media[$profile['logo_dark_media_id'] ?? 0] ?? null,

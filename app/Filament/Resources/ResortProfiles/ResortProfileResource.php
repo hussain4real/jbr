@@ -7,6 +7,7 @@ use App\Filament\Resources\ResortProfiles\Pages\ManageResortProfiles;
 use App\Models\MediaAsset;
 use App\Models\ResortProfile;
 use BackedEnum;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -26,28 +27,36 @@ class ResortProfileResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([Section::make('Resort information and publishing')->description('Save incomplete content as a draft. Address, arrival directions and guest policies can be added later; only published content appears on the public website.')->schema([TextInput::make('key')->default('main')->disabled()->dehydrated()->required(),
-            ...ContentEditor::translated('introduction', 'Introduction'),
-            Select::make('draft.hero_media_id')->label('Homepage photograph')->options(fn (): array => MediaAsset::query()->get()->mapWithKeys(fn (MediaAsset $media): array => [$media->id => data_get($media->draft, 'caption.en', 'Image '.$media->id)])->all()),
-            ...ContentEditor::translated('address', 'Verified address'),
-            ...ContentEditor::translated('arrival', 'Arrival directions'),
-            ...ContentEditor::translated('policies', 'Guest and reservation policies', 6),
-            ...ContentEditor::translated('privacy', 'Approved privacy notice', 8),
-            ...ContentEditor::translated('response_hours', 'Monitored hours / response promise', 2),
-            ...ContentEditor::translated('seo_description', 'Search description', 2),
-            TextInput::make('draft.phone')->label('Telephone')->maxLength(32),
-            TextInput::make('draft.email')->label('Guest contact email')->email()->maxLength(254),
-            Toggle::make('draft.contacts_verified')->label('Telephone and email tested; monitored by staff')->default(false),
-            TextInput::make('draft.whatsapp_number')->label('WhatsApp number (international format)')->maxLength(32),
-            Toggle::make('draft.whatsapp_verified')->label('WhatsApp verified and monitored')->default(false),
-            TextInput::make('draft.map_url')->label('Verified directions URL')->rules(['nullable', 'url:https'])->maxLength(2000),
-            TextInput::make('draft.instagram_url')->label('Instagram URL')->rules(['nullable', 'url:https'])->maxLength(2000),
-            TextInput::make('draft.facebook_url')->label('Facebook URL')->rules(['nullable', 'url:https'])->maxLength(2000),
-            TextInput::make('draft.retention_days')->label('Approved retention after closure (days)')->integer()->minValue(1)->maxValue(3650),
-            Toggle::make('draft.privacy_approved')->label('Privacy notice and retention approved by owner')->default(false),
-            Toggle::make('draft.operations_approved')->label('Staff owner, availability record and confirmation process established')->default(false),
-            Toggle::make('draft.requests_enabled')->label('Ready to receive requests')->default(false)->helperText('Also requires verified mail delivery and server configuration. A request never guarantees availability.'),
-            Toggle::make('draft.arabic_reviewed')->label('Arabic reviewed by a competent speaker')->default(false), ])->columns(2)->columnSpanFull(),
+        return $schema->components([
+            Section::make('Homepage promotion')->description('Show an original poster below the main banner. Upload and publish the poster in Media Assets first. Save your changes as a draft, preview, then publish. Turning this off also removes the public PDF download when you publish.')->schema([
+                Toggle::make('draft.promotion_enabled')->label('Show promotion on homepage')->default(false),
+                Select::make('draft.promotion_media_id')->label('Promotion poster')->options(fn (): array => MediaAsset::query()->whereNotNull('published_at')->get()->mapWithKeys(fn (MediaAsset $media): array => [$media->id => data_get($media->published, 'caption.en', 'Image '.$media->id)])->all())->helperText('Displayed in full without cropping; excluded from the property photo gallery.'),
+                ...ContentEditor::translated('promotion_title', 'Promotion heading', 2),
+                ...ContentEditor::translated('promotion_description', 'Promotion description / accessible text', 4),
+                FileUpload::make('draft.promotion_pdf_path')->label('Original promotion PDF')->disk('local')->directory('website/promotions')->visibility('private')->preventFilePathTampering(allowFilePathUsing: fn (string $file, ?ResortProfile $record): bool => $file === data_get($record?->getOriginal('draft'), 'promotion_pdf_path'))->acceptedFileTypes(['application/pdf'])->maxSize(10240)->previewable(false)->helperText('Up to 10 MB. Draft files remain private. The current published PDF stays available while a replacement is being prepared.'),
+            ])->columns(2)->columnSpanFull()->collapsed(),
+            Section::make('Resort information and publishing')->description('Save incomplete content as a draft. Address, arrival directions and guest policies can be added later; only published content appears on the public website.')->schema([TextInput::make('key')->default('main')->disabled()->dehydrated()->required(),
+                ...ContentEditor::translated('introduction', 'Introduction'),
+                Select::make('draft.hero_media_id')->label('Homepage photograph')->options(fn (): array => MediaAsset::query()->get()->mapWithKeys(fn (MediaAsset $media): array => [$media->id => data_get($media->draft, 'caption.en', 'Image '.$media->id)])->all()),
+                ...ContentEditor::translated('address', 'Verified address'),
+                ...ContentEditor::translated('arrival', 'Arrival directions'),
+                ...ContentEditor::translated('policies', 'Guest and reservation policies', 6),
+                ...ContentEditor::translated('privacy', 'Approved privacy notice', 8),
+                ...ContentEditor::translated('response_hours', 'Monitored hours / response promise', 2),
+                ...ContentEditor::translated('seo_description', 'Search description', 2),
+                TextInput::make('draft.phone')->label('Telephone')->maxLength(32),
+                TextInput::make('draft.email')->label('Guest contact email')->email()->maxLength(254),
+                Toggle::make('draft.contacts_verified')->label('Telephone and email tested; monitored by staff')->default(false),
+                TextInput::make('draft.whatsapp_number')->label('WhatsApp number (international format)')->maxLength(32),
+                Toggle::make('draft.whatsapp_verified')->label('WhatsApp verified and monitored')->default(false),
+                TextInput::make('draft.map_url')->label('Verified directions URL')->rules(['nullable', 'url:https'])->maxLength(2000),
+                TextInput::make('draft.instagram_url')->label('Instagram URL')->rules(['nullable', 'url:https'])->maxLength(2000),
+                TextInput::make('draft.facebook_url')->label('Facebook URL')->rules(['nullable', 'url:https'])->maxLength(2000),
+                TextInput::make('draft.retention_days')->label('Approved retention after closure (days)')->integer()->minValue(1)->maxValue(3650),
+                Toggle::make('draft.privacy_approved')->label('Privacy notice and retention approved by owner')->default(false),
+                Toggle::make('draft.operations_approved')->label('Staff owner, availability record and confirmation process established')->default(false),
+                Toggle::make('draft.requests_enabled')->label('Ready to receive requests')->default(false)->helperText('Also requires verified mail delivery and server configuration. A request never guarantees availability.'),
+                Toggle::make('draft.arabic_reviewed')->label('Arabic reviewed by a competent speaker')->default(false), ])->columns(2)->columnSpanFull(),
             Section::make('Brand artwork')->description('Upload and publish artwork in Media Assets, then select it here. Leave blank to keep the supplied resort logos. Selected logos are excluded from the gallery.')->schema([
                 Select::make('draft.logo_light_media_id')->label('Logo for light backgrounds')->options(fn (): array => MediaAsset::query()->get()->mapWithKeys(fn (MediaAsset $media): array => [$media->id => data_get($media->draft, 'caption.en', 'Image '.$media->id)])->all()),
                 Select::make('draft.logo_dark_media_id')->label('Logo for dark backgrounds')->options(fn (): array => MediaAsset::query()->get()->mapWithKeys(fn (MediaAsset $media): array => [$media->id => data_get($media->draft, 'caption.en', 'Image '.$media->id)])->all()),
