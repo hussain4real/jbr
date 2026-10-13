@@ -104,6 +104,16 @@ test('user management rejects duplicate emails ignoring case', function () {
     expect(User::query()->count())->toBe(2);
 });
 
+test('duplicate email errors from the account action are visible in the creation form', function () {
+    $super = User::factory()->create(['is_staff' => true, 'resort_role' => User::ROLE_SUPER_ADMIN]);
+    User::factory()->create(['email' => 'duplicate@example.invalid']);
+    $this->actingAs($super, 'resort');
+    Livewire::test(ManageUsers::class)->callAction('create', [
+        'name' => 'Duplicate', 'email' => 'DUPLICATE@example.invalid', 'resort_role' => User::ROLE_STAFF,
+    ])->assertHasActionErrors(['email']);
+    expect(User::query()->count())->toBe(2);
+});
+
 test('a super administrator can change another account role and disable access without changing credentials or MFA', function () {
     $super = User::factory()->create(['is_staff' => true, 'resort_role' => User::ROLE_SUPER_ADMIN]);
     $target = User::factory()->create(['is_staff' => true, 'app_authentication_secret' => 'JBSWY3DPEHPK3PXP']);
