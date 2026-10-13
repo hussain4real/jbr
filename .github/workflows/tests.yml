@@ -46,6 +46,12 @@ jobs:
       - name: Run CI Checks
         run: composer ci:check
 
+      - name: Test token-safe request logging
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends nginx rsyslog
+          sudo python3 .github/deploy/test-token-logging.py
+
       - name: Check deployment scripts
         run: |
           bash -n .github/deploy/*.sh

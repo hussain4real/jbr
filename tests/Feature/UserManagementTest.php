@@ -16,7 +16,6 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
@@ -90,7 +89,7 @@ test('a super administrator can create a separate account without sending creden
     ])->assertHasNoActionErrors();
     $created = User::query()->where('email', 'lhassnaoui@tamkeen-hq.com')->sole();
     expect($created->name)->toBe('Lahusseine')->and($created->resort_role)->toBe(User::ROLE_ADMIN)
-        ->and($created->is_staff)->toBeTrue()->and(Hash::check('password', $created->password))->toBeFalse();
+        ->and($created->is_staff)->toBeTrue()->and($created->password)->toBeNull();
     expect($existing->fresh()->password)->toBe($passwordHash);
     expect($existing->fresh()->resort_role)->toBeNull();
     Notification::assertNothingSent();
