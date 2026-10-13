@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password as PasswordRule;
 use Illuminate\Validation\ValidationException;
 use SensitiveParameter;
 
@@ -98,6 +99,43 @@ class ManageResortUsers
             Log::notice('Resort super administrator bootstrapped by server operator', ['target_id' => $target->id]);
 
             return $target;
+        }, 3);
+    }
+
+    public function provisionStaff(string $email, bool $revoke = false, ?string $name = null, #[SensitiveParameter] ?string $password = null): User
+    {
+        return DB::transaction(function () use ($email, $revoke, $name, $password): User {
+            $email = Str::lower(trim($email));
+            Validator::make(['email' => $email], ['email' => ['required', 'email', 'max:254']])->validate();
+            $users = $this->lockedUsers();
+            $target = $users->first(fn (User $user): bool => Str::lower($user->email) === $email);
+            if ($target?->resort_role === User::ROLE_SUPER_ADMIN) {
+                throw ValidationException::withMessages(['email' => 'Super administrator access must be changed through user management.']);
+            }
+            if (! $target) {
+                if ($revoke) {
+                    throw ValidationException::withMessages(['email' => 'Account not found.']);
+                }
+                Validator::make(['name' => $name, 'password' => $password], [
+                    'name' => ['required', 'string', 'max:255'],
+                    'password' => ['required', PasswordRule::min(12)->mixedCase()->numbers()],
+                ])->validate();
+                $target = new User(['name' => $name, 'email' => $email, 'password' => $password]);
+            }
+            $target->forceFill(['resort_role' => $target->resortRole() ?? User::ROLE_STAFF, 'is_staff' => ! $revoke])->save();
+            Log::notice('Resort staff access changed by server operator', ['target_id' => $target->id, 'active' => $target->is_staff]);
+
+            return $target;
+        }, 3);
+    }
+
+    public function deleteOwnProfile(User $user): void
+    {
+        DB::transaction(function () use ($user): void {
+            $users = $this->lockedUsers();
+            $user = $users->find($user->id) ?? abort(404);
+            abort_if($user->is_staff || $user->resort_role !== null, 403);
+            $user->delete();
         }, 3);
     }
 

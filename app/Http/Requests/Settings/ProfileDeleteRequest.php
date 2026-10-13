@@ -12,7 +12,7 @@ class ProfileDeleteRequest extends FormRequest
 
     public function authorize(): bool
     {
-        return ! $this->user()?->is_staff;
+        return ! $this->user()?->is_staff && $this->user()?->resort_role === null;
     }
 
     /**

@@ -2,6 +2,8 @@
 
 use App\Actions\ManageResortUsers;
 use App\Filament\Resources\Users\Pages\ManageUsers;
+use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Requests\Settings\ProfileDeleteRequest;
 use App\Models\Faq;
 use App\Models\GuestRequest;
 use App\Models\User;
@@ -9,11 +11,17 @@ use Filament\Actions\Testing\TestAction;
 use Filament\Auth\Notifications\ResetPassword;
 use Filament\Facades\Filament;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 beforeEach(function () {
     Filament::setCurrentPanel(Filament::getPanel('admin'));
@@ -182,4 +190,70 @@ test('server provisioning defaults new staff to inbox access and preserves exist
     $existing = User::factory()->create(['is_staff' => true]);
     $this->artisan('website:staff', ['email' => $existing->email])->assertSuccessful();
     expect($existing->fresh()->canManageWebsite())->toBeTrue();
+});
+
+test('server granting an existing ordinary account gives only staff access', function () {
+    $ordinary = User::factory()->create();
+    $this->artisan('website:staff', ['email' => $ordinary->email])->assertSuccessful();
+    expect($ordinary->fresh()->resort_role)->toBe(User::ROLE_STAFF)
+        ->and($ordinary->fresh()->canManageGuestRequests())->toBeTrue()
+        ->and($ordinary->fresh()->canManageWebsite())->toBeFalse();
+});
+
+test('a stale revoke cannot disable an account bootstrapped after the command preflight read', function () {
+    $target = User::factory()->create(['is_staff' => true]);
+    $promoted = false;
+    DB::listen(function (QueryExecuted $query) use ($target, &$promoted): void {
+        if (! $promoted && str_contains($query->sql, 'LOWER(email)')) {
+            $promoted = true;
+            app(ManageResortUsers::class)->bootstrap($target->email);
+        }
+    });
+    $this->artisan('website:staff', ['email' => $target->email, '--revoke' => true])->assertFailed();
+    expect($promoted)->toBeTrue()->and($target->fresh()->isSuperAdmin())->toBeTrue();
+});
+
+test('profile deletion rechecks an account promoted after request authorization', function () {
+    $target = User::factory()->create();
+    $request = ProfileDeleteRequest::create('/settings/profile', 'DELETE');
+    $request->setUserResolver(fn (): User => $target);
+    expect($request->authorize())->toBeTrue();
+    $users = app(ManageResortUsers::class);
+    $users->bootstrap($target->email);
+    expect(fn () => app(ProfileController::class)->destroy($request, $users))->toThrow(HttpException::class);
+    expect($target->fresh()->isSuperAdmin())->toBeTrue();
+});
+
+test('revoked legacy administrators retain their role and cannot delete their profile', function () {
+    $target = User::factory()->create(['is_staff' => true]);
+    $this->artisan('website:staff', ['email' => $target->email, '--revoke' => true])->assertSuccessful();
+    expect($target->fresh()->resort_role)->toBe(User::ROLE_ADMIN);
+    $this->actingAs($target->fresh(), 'web')->delete(route('profile.destroy'), ['password' => 'password'])->assertForbidden();
+    $this->artisan('website:staff', ['email' => $target->email])->assertSuccessful();
+    expect($target->fresh()->canManageWebsite())->toBeTrue();
+});
+
+test('disabling an account blocks its already established resort session on the next request', function () {
+    $super = User::factory()->create(['is_staff' => true, 'resort_role' => User::ROLE_SUPER_ADMIN]);
+    $staff = User::factory()->create(['is_staff' => true, 'resort_role' => User::ROLE_STAFF, 'app_authentication_secret' => 'JBSWY3DPEHPK3PXP']);
+    $session = [Auth::guard('resort')->getName() => $staff->id];
+    $this->withSession($session)->get('/admin')->assertOk();
+    app(ManageResortUsers::class)->update($super, $staff, ['name' => $staff->name, 'resort_role' => User::ROLE_STAFF, 'is_staff' => false]);
+    Auth::guard('resort')->forgetUser();
+    $this->withSession($session)->get('/admin')->assertForbidden();
+});
+
+test('the additive role migration preserves legacy users and authentication data without promoting anyone', function () {
+    Schema::table('users', function (Blueprint $table): void {
+        $table->dropColumn('resort_role');
+    });
+    $legacy = User::factory()->create(['is_staff' => true, 'app_authentication_secret' => 'JBSWY3DPEHPK3PXP']);
+    $ordinary = User::factory()->create();
+    $before = $legacy->getAttributes();
+    $migration = require database_path('migrations/2026_10_13_084124_add_resort_role_to_users_table.php');
+    $migration->up();
+    expect($legacy->fresh()->canManageWebsite())->toBeTrue()->and($legacy->fresh()->isSuperAdmin())->toBeFalse();
+    expect($legacy->fresh()->getAttributes())->toMatchArray($before);
+    expect($ordinary->fresh()->canAccessPanel(Filament::getPanel('admin')))->toBeFalse();
+    expect(User::query()->whereNotNull('resort_role')->exists())->toBeFalse();
 });
