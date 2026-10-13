@@ -44,7 +44,9 @@ jobs:
           npm run build:ssr
 
       - name: Run CI Checks
-        run: composer ci:check
+        run: |
+          composer ci:check
+          node --test tests/Unit/CopySetupLink.test.mjs
 
       - name: Test token-safe request logging
         run: |
