@@ -85,6 +85,26 @@ class ManageResortUsers
         }, 3);
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @param  Closure(string): void  $handoff
+     */
+    public function prepareAccountSetup(User $actor, array $data, Closure $handoff): User
+    {
+        return DB::transaction(function () use ($actor, $data, $handoff): User {
+            Validator::make($data, ['resort_role' => ['required', Rule::in([User::ROLE_ADMIN])]])->validate();
+            if (config('auth.passwords.users.expire') !== 60) {
+                throw ValidationException::withMessages(['email' => 'Private account setup requires the 60-minute users password broker.']);
+            }
+            $target = $this->create($actor, $data);
+            $token = Password::broker('users')->createToken($target);
+            $handoff(Filament::getPanel('admin')->getResetPasswordUrl($token, $target));
+            $this->audit('private_setup_prepared', $actor, $target);
+
+            return $target;
+        });
+    }
+
     public function bootstrap(string $email): User
     {
         return DB::transaction(function () use ($email): User {
