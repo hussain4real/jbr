@@ -2,6 +2,7 @@
 
 return [
     'name' => 'Jawharat Bidiyah Resort',
+    'admin_domain' => env('RESORT_ADMIN_DOMAIN'),
     'local_preview' => env('WEBSITE_LOCAL_PREVIEW', false),
     'timezone' => 'Asia/Muscat',
     'accept_requests' => env('WEBSITE_ACCEPT_REQUESTS', false),
