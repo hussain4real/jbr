@@ -1,0 +1,2 @@
+d /var/log/jbr-nginx-socket 0750 syslog www-data -
+d /var/log/jbr-nginx 0750 syslog adm -
