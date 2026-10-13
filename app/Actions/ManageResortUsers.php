@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -82,6 +83,31 @@ class ManageResortUsers
                 throw ValidationException::withMessages(['email' => __($status)]);
             }
             $this->audit('setup_link_requested', $actor, $target);
+        }, 3);
+    }
+
+    /** @return array{url: string, expiresAt: string} */
+    public function generateSetupLink(User $actor, User $target, int $minutes = 60): array
+    {
+        return DB::transaction(function () use ($actor, $target, $minutes): array {
+            $users = $this->lockedUsers();
+            $target = $users->find($target->id) ?? abort(404);
+            Gate::forUser($users->find($actor->id))->authorize('generateSetupLink', $target);
+            Validator::make(['minutes' => $minutes], ['minutes' => ['required', Rule::in([60, 900])]])->validate();
+            $broker = Password::broker('users');
+            if ($broker->getRepository()->recentlyCreatedToken($target)) {
+                throw ValidationException::withMessages(['minutes' => 'A link was just generated. Wait one minute before replacing it.']);
+            }
+            $expiresAt = now()->addMinutes($minutes);
+            $token = $broker->createToken($target);
+            DB::table(config('auth.passwords.users.table'))->where('email', $target->getEmailForPasswordReset())
+                ->update(['setup_expires_at' => $expiresAt]);
+            $url = URL::temporarySignedRoute('filament.admin.auth.password-reset.reset', $expiresAt, [
+                'email' => $target->getEmailForPasswordReset(), 'token' => $token,
+            ]);
+            $this->audit('private_setup_link_generated', $actor, $target);
+
+            return ['url' => $url, 'expiresAt' => $expiresAt->toIso8601String()];
         }, 3);
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Auth\SetupPasswordBrokerManager;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -18,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->extend('auth.password', fn ($manager, $app) => new SetupPasswordBrokerManager($app));
     }
 
     /**

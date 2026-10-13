@@ -56,6 +56,9 @@ class UserResource extends Resource
                     return $data;
                 })
                 ->using(fn (User $record, array $data, ManageResortUsers $users): User => $users->update(Filament::auth()->user(), $record, $data)),
+            Action::make('generateSetupLink')->label('Generate and copy setup link')->authorize('generateSetupLink')
+                ->modalHeading('Generate and copy setup link')->modalSubmitAction(false)->modalCancelActionLabel('Close')
+                ->modalContent(fn (User $record) => view('filament.users.copy-setup-link', ['targetId' => $record->id, 'email' => $record->email])),
             Action::make('sendSetupLink')->label('Send password setup link')->authorize('sendSetupLink')->requiresConfirmation()
                 ->modalDescription(fn (User $record): string => 'Email a password setup link to '.$record->email.'. This does not change the password or disable authenticator verification.')
                 ->action(function (User $record, ManageResortUsers $users): void {
