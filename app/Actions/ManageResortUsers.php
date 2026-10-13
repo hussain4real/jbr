@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use App\Models\User;
+use Closure;
 use Filament\Auth\Notifications\ResetPassword;
 use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Collection;
@@ -34,7 +35,7 @@ class ManageResortUsers
             if (User::query()->whereRaw('LOWER(email) = ?', [$data['email']])->exists()) {
                 throw ValidationException::withMessages(['email' => 'An account with this email address already exists.']);
             }
-            $user = new User(['name' => $data['name'], 'email' => $data['email'], 'password' => Str::random(64)]);
+            $user = new User(['name' => $data['name'], 'email' => $data['email'], 'password' => null]);
             $user->forceFill(['resort_role' => $data['resort_role'], 'is_staff' => true])->save();
             $this->audit('created', $actor, $user);
 
@@ -100,6 +101,35 @@ class ManageResortUsers
 
             return $target;
         }, 3);
+    }
+
+    /** @param Closure(string): void $handoff */
+    public function prepareOwnerSetup(string $email, ?string $name, bool $create, Closure $handoff): User
+    {
+        return DB::transaction(function () use ($email, $name, $create, $handoff): User {
+            $email = Str::lower(trim($email));
+            Validator::make(['email' => $email], ['email' => ['required', 'email', 'max:254']])->validate();
+            $users = $this->lockedUsers();
+            $target = $users->first(fn (User $user): bool => Str::lower($user->email) === $email);
+            if ($create) {
+                if ($users->contains(fn (User $user): bool => $user->resort_role === User::ROLE_SUPER_ADMIN)) {
+                    throw ValidationException::withMessages(['email' => 'A super administrator already exists. Use user management for further access changes.']);
+                }
+                if ($target) {
+                    throw ValidationException::withMessages(['email' => 'An account with this email address already exists. Existing credentials will not be changed.']);
+                }
+                Validator::make(['name' => $name], ['name' => ['required', 'string', 'max:255']])->validate();
+                $target = new User(['name' => $name, 'email' => $email, 'password' => null]);
+                $target->forceFill(['resort_role' => User::ROLE_SUPER_ADMIN, 'is_staff' => true])->save();
+            } elseif (! $target || ! $target->isSuperAdmin() || $target->password !== null) {
+                throw ValidationException::withMessages(['email' => 'Setup can only be reissued for an active super administrator who has not set a password.']);
+            }
+            $token = Password::broker('users')->createToken($target);
+            $handoff(Filament::getPanel('admin')->getResetPasswordUrl($token, $target));
+            Log::notice('Resort owner password setup prepared by server operator', ['target_id' => $target->id]);
+
+            return $target;
+        });
     }
 
     public function provisionStaff(string $email, bool $revoke = false, ?string $name = null, #[SensitiveParameter] ?string $password = null): User
