@@ -14,7 +14,7 @@ class WebsitePromotionController extends Controller
     {
         $preview = $request->boolean('preview');
         if ($preview) {
-            abort_unless($request->hasValidSignature() && ($request->user('resort')?->is_staff || WebsiteData::localPreview()), 404);
+            abort_unless($request->hasValidSignature() && ($request->user('resort')?->canManageWebsite() || WebsiteData::localPreview()), 404);
         }
         $content = $preview ? $profile->draft : $profile->published;
         $path = $profile->promotionPdfPath($preview);
