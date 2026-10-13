@@ -12,7 +12,7 @@ class ProvisionResortStaff extends Command
 {
     protected $signature = 'website:staff {email} {--name=} {--revoke : Remove staff access}';
 
-    protected $description = 'Deliberately grant or revoke resort administrator access; new accounts require an interactive password';
+    protected $description = 'Deliberately grant or revoke resort staff access; new accounts require an interactive password';
 
     public function handle(): int
     {
@@ -22,7 +22,12 @@ class ProvisionResortStaff extends Command
 
             return self::FAILURE;
         }
-        $user = User::query()->where('email', $email)->first();
+        $user = User::query()->whereRaw('LOWER(email) = ?', [strtolower($email)])->first();
+        if ($user?->resort_role === User::ROLE_SUPER_ADMIN) {
+            $this->error('Super administrator access must be changed through user management.');
+
+            return self::FAILURE;
+        }
         if ($this->option('revoke')) {
             if (! $user) {
                 $this->error('Account not found.');
@@ -49,6 +54,7 @@ class ProvisionResortStaff extends Command
                 return self::FAILURE;
             }
             $user = new User(['name' => $name, 'email' => $email, 'password' => Hash::make($password)]);
+            $user->forceFill(['resort_role' => User::ROLE_STAFF]);
         }
         $user->forceFill(['is_staff' => true])->save();
         $this->info('Staff access granted. Enrol in authenticator MFA at /admin before using the panel.');

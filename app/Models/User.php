@@ -33,11 +33,18 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property bool $is_staff
+ * @property string|null $resort_role
  */
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery, PasskeyUser
 {
+    public const ROLE_STAFF = 'staff';
+
+    public const ROLE_ADMIN = 'admin';
+
+    public const ROLE_SUPER_ADMIN = 'super_admin';
+
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
 
@@ -47,7 +54,33 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $panel->getId() === 'admin' && $this->is_staff;
+        return $panel->getId() === 'admin' && $this->canManageGuestRequests();
+    }
+
+    /** @return array<string, string> */
+    public static function resortRoles(): array
+    {
+        return [self::ROLE_STAFF => 'Staff — guest inbox', self::ROLE_ADMIN => 'Administrator — website and guest inbox', self::ROLE_SUPER_ADMIN => 'Super administrator — website, guest inbox and users'];
+    }
+
+    public function resortRole(): ?string
+    {
+        return $this->resort_role ?? ($this->is_staff ? self::ROLE_ADMIN : null);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->is_staff && $this->resortRole() === self::ROLE_SUPER_ADMIN;
+    }
+
+    public function canManageWebsite(): bool
+    {
+        return $this->is_staff && in_array($this->resortRole(), [self::ROLE_ADMIN, self::ROLE_SUPER_ADMIN], true);
+    }
+
+    public function canManageGuestRequests(): bool
+    {
+        return $this->is_staff && array_key_exists($this->resortRole() ?? '', self::resortRoles());
     }
 
     /**

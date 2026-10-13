@@ -9,22 +9,22 @@ class FaqPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->is_staff === true;
+        return $user->canManageWebsite();
     }
 
     public function view(User $user, Faq $record): bool
     {
-        return $user->is_staff === true;
+        return $user->canManageWebsite();
     }
 
     public function create(User $user): bool
     {
-        return $user->is_staff === true;
+        return $user->canManageWebsite();
     }
 
     public function update(User $user, Faq $record): bool
     {
-        return $user->is_staff === true;
+        return $user->canManageWebsite();
     }
 
     public function delete(User $user, Faq $record): bool

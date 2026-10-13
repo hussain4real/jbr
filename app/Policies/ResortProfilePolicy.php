@@ -9,22 +9,22 @@ class ResortProfilePolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->is_staff === true;
+        return $user->canManageWebsite();
     }
 
     public function view(User $user, ResortProfile $record): bool
     {
-        return $user->is_staff === true;
+        return $user->canManageWebsite();
     }
 
     public function create(User $user): bool
     {
-        return $user->is_staff && ! ResortProfile::query()->exists();
+        return $user->canManageWebsite() && ! ResortProfile::query()->exists();
     }
 
     public function update(User $user, ResortProfile $record): bool
     {
-        return $user->is_staff === true;
+        return $user->canManageWebsite();
     }
 
     public function delete(User $user, ResortProfile $record): bool

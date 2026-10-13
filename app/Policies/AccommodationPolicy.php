@@ -9,22 +9,22 @@ class AccommodationPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->is_staff === true;
+        return $user->canManageWebsite();
     }
 
     public function view(User $user, Accommodation $record): bool
     {
-        return $user->is_staff === true;
+        return $user->canManageWebsite();
     }
 
     public function create(User $user): bool
     {
-        return $user->is_staff === true;
+        return $user->canManageWebsite();
     }
 
     public function update(User $user, Accommodation $record): bool
     {
-        return $user->is_staff === true;
+        return $user->canManageWebsite();
     }
 
     public function delete(User $user, Accommodation $record): bool
