@@ -31,6 +31,12 @@ class UserPolicy
         return $this->update($user, $record) && $record->canManageGuestRequests();
     }
 
+    public function generateSetupLink(User $user, User $record): bool
+    {
+        return $this->sendSetupLink($user, $record) && $record->password === null
+            && filled($user->getAppAuthenticationSecret());
+    }
+
     public function delete(User $user, User $record): bool
     {
         return false;
