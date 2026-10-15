@@ -330,3 +330,15 @@ Verification completed:
 - Desktop screenshot: `/Users/amisha/.codex/visualizations/2026/10/14/01a13b90-61ef-7eb2-aece-2330f240b3b7/footer-fix-en-desktop.jpg`.
 
 This correction does not change content publication, requests, dependencies or hosting. The working changes remain local; remote GitHub Actions and deployment have not run for this revision. The user's approval/review confirmations are recorded here; CMS publication remains a separate release action.
+
+## Release preparation — 15 October 2026
+
+The user authorized committing/pushing the redesign, opening a PR, merging after green CI, deploying, publishing the approved source content and verifying the live English and Arabic pages. The redesign branch includes current `main` (`beb00134b1be497c0a21e09bce3b981f86aea6b6`) so its newer administrator, account setup and token-safe logging changes are preserved.
+
+- Integrated `composer ci:check`: passed frontend formatting/lint, Vue types, Pint, PHPStan and Pest: **252 passed, 2 existing skips, 1,589 assertions (254 total)**.
+- Integrated `npm run build:ssr`: passed client and SSR builds.
+- Account setup clipboard regression checks: **4 passed**.
+- Booking/enquiry regressions: **27 passed, 266 assertions**. Requests are persisted for staff confirmation; they do not create confirmed reservations.
+- Live pre-release audit: deployed revision matches current `main`. Booking requests are disabled; privacy/retention and notification readiness remain outstanding. The redesign's local draft preview also deliberately disables requests. Publishing the approved redesign does not by itself enable guest submissions.
+
+Remote CI, merged revision, deployment, backup, content publication and live verification will be recorded separately as they complete. Existing production request/notification settings are preserved; no operational policy or mail-delivery approval is inferred from the supplied design.
