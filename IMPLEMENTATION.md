@@ -363,3 +363,27 @@ The browser exposed an SSR hydration warning on the homepage. Comparing server m
 Final validation and deployment of this small follow-up are recorded through its PR. Physical-device swipe acceptance and activation of website submissions remain outstanding; no guest enquiry or external message was sent during verification.
 
 Follow-up local validation: frontend format/lint, Vue TypeScript and client/SSR production builds passed. This removes inert template markup and fixes accessibility references; persistence and notification behavior are unchanged. The required CI suite runs again on the follow-up PR and its merge commit.
+
+## Request activation — 15 October 2026
+
+The user approved the remaining release items and instructed activation. This supersedes earlier statements that public website submissions remain disabled. Physical-device swipe is accepted for release by the owner; no physical-device test by this agent is claimed.
+
+- Published a bilingual privacy notice describing the actual collected fields, staff use, hosting/email processing, form security, manual messaging channels and the approved 90-day anonymization period after request closure. Correspondence, logs and backups are identified as separate from website-record retention.
+- Set published/draft privacy approval and request flags to true, retaining the approved 90-day value and operating-process approval. Enabled `WEBSITE_ACCEPT_REQUESTS` in the shared production environment. Mail/notification routing was already enabled; no transport or recipient change was needed.
+- Backup before activation: `/var/www/jbr/shared/backups/request-activation-20261015T040253Z`, containing an integrity-checked SQLite backup, the original profile and a restricted environment backup. Laravel configuration was rebuilt, PHP-FPM reloaded and queue workers gracefully restarted.
+- The existing `/etc/cron.d/jbr` scheduler runs each minute; Laravel schedules retention/notification maintenance hourly. Cron, SSR and queue processes were checked. `/up`, `/en` and `/ar` health checks passed.
+- Affected request/publication tests: **34 passed, 283 assertions**. Production now reports `acceptsRequests=true`. English and Arabic booking/enquiry submit buttons are enabled, both privacy pages render the notice, and empty booking submissions return localized server validation without a closed-request error.
+- No valid synthetic guest request or external test email was sent. Automated tests cover request persistence and notification behavior; fresh production email delivery is not claimed. The isolated local draft preview continues to disable submissions deliberately.
+
+Activation uses the existing deployed code (`0bc759fd628b71572ed24539e5a252b17417bc56`); no application-code deployment or dependency/schema change was required.
+
+## Live test booking — 15 October 2026
+
+The user authorized one real test submission and both notification emails, choosing the connected personal Gmail mailbox for the guest receipt. Submitted through the public English booking form at **07:31:59 Qatar time**. Test record **ID 3**, reference `bb4aaebf-e27f-406a-add3-6835adb9dbba`, is labelled `TEST - JBR website delivery check`, with fictional phone details, Majan Villa, 24–26 October and two guests. Its message explicitly says no reservation is required.
+
+- Public receipt displays the same reference. The actual private admin **Guest inbox** visibly listed the test record, initially status `new`, and both email statuses `sent`.
+- Queue verification: no pending jobs and no failed jobs after processing. These application states establish SMTP acceptance, not final staff mailbox delivery.
+- Guest delivery independently confirmed through the connected Gmail API: message `1a13dd4e48ebb9d8`, matching request reference, **INBOX**, received at **07:32:04 Qatar time**. SPF and DKIM pass; the relay hop used TLS 1.3. The receipt explicitly leaves availability and reservation confirmation to staff.
+- Staff delivery independently confirmed through the resort's Google Workspace **Email Log Search**: the sole matching notification today was received at **07:32:02 Qatar time** and **delivered to the Gmail mailbox at 07:32:05**, recipient `reservations@jauharat.com`, message ID `<140b5d9562fad3fe8e18886dc482d206@jauharat.com>`. Post-delivery details show **Location: Inbox**, labels `None`, and state `Opened and read, Seen, Marked important`. The trace includes an intermediate `Marked spam` event; the final observed mailbox location is Inbox. No mail-routing or security settings were changed.
+- After delivery verification, closed test record **ID 3** through the admin follow-up form with outcome `Enquiry answered` and notes identifying the completed synthetic test, verified deliveries and absence of a reservation. The inbox now shows `closed`, with both email statuses still `sent`. This removes the synthetic request from active follow-up and starts its approved 90-day retention window.
+- Screenshots: `test-booking-admin-inbox.png`, `test-booking-receipt.png`, `test-booking-staff-delivery.png` and `test-booking-closed.png` in the existing review visualization directory. The public submission, admin inbox entry and both guest/staff email deliveries are verified. No additional valid test submission was created.
