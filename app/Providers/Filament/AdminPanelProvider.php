@@ -27,6 +27,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->authGuard('resort')
+            ->domain(config('website.admin_domain'))
             ->path('admin')
             ->login()
             ->passwordReset()

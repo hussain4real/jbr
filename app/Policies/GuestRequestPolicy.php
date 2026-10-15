@@ -9,12 +9,12 @@ class GuestRequestPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->is_staff === true;
+        return $user->canManageGuestRequests();
     }
 
     public function view(User $user, GuestRequest $record): bool
     {
-        return $user->is_staff === true;
+        return $user->canManageGuestRequests();
     }
 
     public function create(User $user): bool
@@ -24,7 +24,7 @@ class GuestRequestPolicy
 
     public function update(User $user, GuestRequest $record): bool
     {
-        return $user->is_staff === true;
+        return $user->canManageGuestRequests();
     }
 
     public function delete(User $user, GuestRequest $record): bool

@@ -26,7 +26,7 @@ class WebsiteController extends Controller
 
     public function preview(Request $request, WebsiteData $data): Response|RedirectResponse
     {
-        abort_unless($request->user()?->is_staff, 403);
+        abort_unless($request->user()?->canManageWebsite(), 403);
         $model = match ($request->route('type')) {
             'profile' => ResortProfile::class, 'accommodation' => Accommodation::class,
             'media' => MediaAsset::class, 'faq' => Faq::class, default => abort(404),
