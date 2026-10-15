@@ -19,9 +19,7 @@ class SetWebsiteLocale
         if (! app(WebsiteData::class)->isIndexable() || $request->routeIs('website.received', 'website.preview')) {
             $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
         }
-        if ($request->routeIs('website.received', 'website.preview', 'website.booking', 'website.contact')) {
-            $response->headers->set('Cache-Control', 'private, no-store');
-        }
+        $response->headers->set('Cache-Control', 'private, no-store');
 
         return $response;
     }

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -36,6 +37,9 @@ class MediaAsset extends Model
             'rights_confirmed' => 'accepted', 'property_verified' => 'accepted', 'arabic_reviewed' => 'accepted',
             'sort_order' => 'required|integer|min:0|max:10000', 'focal_x' => 'required|integer|min:0|max:100',
             'focal_y' => 'required|integer|min:0|max:100',
+            'category' => ['sometimes', Rule::in(['resort', 'villas', 'dining', 'sport', 'desert'])],
+            'gallery_visible' => 'sometimes|boolean',
+            'source_key' => 'sometimes|string|max:80',
         ];
     }
 

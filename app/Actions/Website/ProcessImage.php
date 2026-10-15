@@ -34,11 +34,13 @@ class ProcessImage
             if (! $target) {
                 throw new RuntimeException('Image processing failed.');
             }
-            $white = imagecolorallocate($target, 255, 255, 255);
-            if ($white === false) {
+            imagealphablending($target, false);
+            imagesavealpha($target, true);
+            $transparent = imagecolorallocatealpha($target, 255, 255, 255, 127);
+            if ($transparent === false) {
                 throw new RuntimeException('Image processing failed.');
             }
-            imagefill($target, 0, 0, $white);
+            imagefill($target, 0, 0, $transparent);
             imagecopyresampled($target, $source, 0, 0, 0, 0, $width, $height, $info[0], $info[1]);
             ob_start();
             imagewebp($target, null, 82);

@@ -4,12 +4,14 @@ namespace App\Filament\Resources\Accommodations;
 
 use App\Filament\ContentEditor;
 use App\Filament\Resources\Accommodations\Pages\ManageAccommodations;
+use App\Filament\WebsiteRedesignEditor;
 use App\Models\Accommodation;
 use App\Models\MediaAsset;
 use BackedEnum;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
@@ -26,7 +28,9 @@ class AccommodationResource extends Resource
             ...ContentEditor::translated('title', 'Name', 1),
             ...ContentEditor::translated('description', 'Description'),
             ...ContentEditor::translated('inclusions', 'Confirmed inclusions'),
-            TextInput::make('draft.capacity')->label('Maximum guests')->integer()->minValue(1)->maxValue(1000),
+            ...WebsiteRedesignEditor::accommodation(),
+            Select::make('draft.capacity_basis')->label('Occupancy basis')->options(['guests' => 'Total guests', 'adults' => 'Adults only; child allowances must be confirmed separately'])->default('guests')->live(),
+            TextInput::make('draft.capacity')->label(fn (Get $get): string => $get('draft.capacity_basis') === 'adults' ? 'Maximum adults' : 'Maximum guests')->integer()->minValue(1)->maxValue(1000),
             Select::make('draft.media_ids')->label('Photographs')->multiple()->options(fn (): array => MediaAsset::query()->get()->mapWithKeys(fn (MediaAsset $media): array => [$media->id => data_get($media->draft, 'caption.en', 'Image '.$media->id)])->all()),
             ...ContentEditor::approvals(), ])->columns(2);
     }

@@ -46,6 +46,9 @@ class WebsiteController extends Controller
             };
         }
         $props = $data->forLocale($locale, $preview);
+        if (in_array($page, ['experiences', 'dining', 'sport', 'schools'], true)) {
+            abort_unless(isset($props['redesign']['pages'][$page]), 404);
+        }
         if ($page === 'accommodation') {
             abort_if(count($props['accommodations']) === 0, 404);
         }
@@ -89,10 +92,19 @@ class WebsiteController extends Controller
             $token = Crypt::encryptString(json_encode(['id' => (string) Str::uuid(), 'session' => hash('sha256', $request->session()->getId()), 'kind' => $page === 'booking' ? 'booking' : 'enquiry', 'expires' => now()->addHours(2)->timestamp], JSON_THROW_ON_ERROR));
         }
 
-        return Inertia::render('public/Website', [...$props,
+        $submissionTokens = [];
+        foreach (['booking', 'enquiry'] as $kind) {
+            $submissionTokens[$kind] = Crypt::encryptString(json_encode(['id' => (string) Str::uuid(), 'session' => hash('sha256', $request->session()->getId()), 'kind' => $kind, 'expires' => now()->addHours(2)->timestamp], JSON_THROW_ON_ERROR));
+        }
+
+        $sourcePage = $page === 'accommodation' ? 'accommodations' : $page;
+        $useRedesign = $props['redesign'] && (! in_array($page, ['home', 'accommodation', 'gallery', 'contact'], true) || isset($props['redesign']['pages'][$sourcePage]));
+
+        return Inertia::render($useRedesign ? 'public/Redesign' : 'public/Website', [...$props,
             'page' => $page, 'stay' => $stay, 'receipt' => $receipt, 'alternateUrl' => $alternateUrl,
             'canonicalUrl' => $request->url(), 'submissionToken' => $token,
             'selectedAccommodation' => $request->query('accommodation'), 'today' => now(config('website.timezone'))->toDateString(),
+            'submissionTokens' => $submissionTokens,
         ]);
     }
 
@@ -107,6 +119,11 @@ class WebsiteController extends Controller
                 }
                 if ($content['media']) {
                     $paths[] = route('website.gallery', ['locale' => $locale]);
+                }
+                foreach (['experiences', 'dining', 'sport', 'schools'] as $page) {
+                    if (isset($content['redesign']['pages'][$page])) {
+                        $paths[] = route('website.'.$page, ['locale' => $locale]);
+                    }
                 }
                 if ($content['profile']['privacy']) {
                     $paths[] = route('website.privacy', ['locale' => $locale]);

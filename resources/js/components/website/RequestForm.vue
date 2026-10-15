@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, useForm } from '@inertiajs/vue3';
-import { computed, nextTick, ref } from 'vue';
+import { computed, nextTick, ref, useId, watch } from 'vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,7 @@ import {
     enquiry as sendEnquiry,
 } from '@/actions/App/Http/Controllers/GuestRequestController';
 import { privacy } from '@/routes/website';
-import type { Accommodation, Locale } from '@/types/website';
+import type { Accommodation, Locale, RequestDetails } from '@/types/website';
 const props = defineProps<{
     locale: Locale;
     copy: Record<string, string>;
@@ -22,7 +22,13 @@ const props = defineProps<{
     enabled: boolean;
     hasContacts: boolean;
     hasPrivacy: boolean;
+    allowDirect?: boolean;
+    context?: string;
+    initial?: RequestDetails;
 }>();
+const emit = defineEmits<{ 'update:details': [details: RequestDetails] }>();
+const formId = useId();
+const fieldId = (name: string): string => `${formId}-${name}`;
 const ar = computed(() => props.locale === 'ar');
 const systemText = (en: string, arabic: string): string =>
     ar.value ? arabic : en;
@@ -33,15 +39,39 @@ const form = useForm({
     name: '',
     email: '',
     phone: '',
-    accommodation_id: props.selected ?? '',
-    arrival: '',
-    departure: '',
-    guests: 1,
+    accommodation_id: props.initial?.accommodation_id ?? props.selected ?? '',
+    arrival: props.initial?.arrival ?? '',
+    departure: props.initial?.departure ?? '',
+    guests: props.initial?.guests ?? 1,
     message: '',
     privacy: false,
     company: '',
     submission_token: props.token,
 });
+watch(
+    () => props.initial,
+    (initial, previous) => {
+        if (!initial) return;
+        if (initial.accommodation_id !== previous?.accommodation_id)
+            form.accommodation_id = initial.accommodation_id;
+        if (initial.arrival !== previous?.arrival)
+            form.arrival = initial.arrival;
+        if (initial.departure !== previous?.departure)
+            form.departure = initial.departure;
+        if (initial.guests !== previous?.guests) form.guests = initial.guests;
+    },
+    { deep: true },
+);
+watch(
+    () => ({
+        accommodation_id: form.accommodation_id,
+        arrival: form.arrival,
+        departure: form.departure,
+        guests: form.guests,
+    }),
+    (details) => emit('update:details', details),
+    { immediate: true },
+);
 const messages = computed(() => Object.values(form.errors));
 async function focusErrors(): Promise<void> {
     await nextTick();
@@ -50,6 +80,10 @@ async function focusErrors(): Promise<void> {
 function submit(): void {
     if (!props.enabled || form.processing) return;
     connectionError.value = false;
+    form.transform((data) => ({
+        ...data,
+        message: [props.context, data.message].filter(Boolean).join('\n\n'),
+    }));
     form.post((props.booking ? sendBooking : sendEnquiry)(props.locale).url, {
         preserveScroll: true,
         onError: () => {
@@ -103,7 +137,7 @@ function submit(): void {
                 }}
             </p>
         </div>
-        <fieldset v-if="enabled" class="grid gap-6">
+        <fieldset v-if="enabled || allowDirect" class="grid gap-6">
             <legend class="sr-only">
                 {{
                     booking
@@ -113,15 +147,15 @@ function submit(): void {
             </legend>
             <template v-if="booking">
                 <div class="field">
-                    <Label for="accommodation">{{
+                    <Label :for="fieldId('accommodation')">{{
                         text('form_accommodation')
                     }}</Label
                     ><select
-                        id="accommodation"
+                        :id="fieldId('accommodation')"
                         v-model="form.accommodation_id"
                         name="accommodation_id"
                         :aria-invalid="!!form.errors.accommodation_id"
-                        aria-describedby="accommodation-error"
+                        :aria-describedby="fieldId('accommodation-error')"
                     >
                         <option value="">
                             {{ text('form_choose') }}
@@ -134,49 +168,51 @@ function submit(): void {
                             {{ stay.title }}
                         </option></select
                     ><InputError
-                        id="accommodation-error"
+                        :id="fieldId('accommodation-error')"
                         :message="form.errors.accommodation_id"
                     />
                 </div>
                 <div class="grid gap-6 sm:grid-cols-2">
                     <div class="field">
-                        <Label for="arrival">{{ text('form_arrival') }} *</Label
+                        <Label :for="fieldId('arrival')"
+                            >{{ text('form_arrival') }} *</Label
                         ><Input
-                            id="arrival"
+                            :id="fieldId('arrival')"
                             v-model="form.arrival"
                             name="arrival"
                             type="date"
                             :min="today"
                             required
                             :aria-invalid="!!form.errors.arrival"
-                            aria-describedby="arrival-error"
+                            :aria-describedby="fieldId('arrival-error')"
                         /><InputError
-                            id="arrival-error"
+                            :id="fieldId('arrival-error')"
                             :message="form.errors.arrival"
                         />
                     </div>
                     <div class="field">
-                        <Label for="departure"
+                        <Label :for="fieldId('departure')"
                             >{{ text('form_departure') }} *</Label
                         ><Input
-                            id="departure"
+                            :id="fieldId('departure')"
                             v-model="form.departure"
                             name="departure"
                             type="date"
                             :min="form.arrival || today"
                             required
                             :aria-invalid="!!form.errors.departure"
-                            aria-describedby="departure-error"
+                            :aria-describedby="fieldId('departure-error')"
                         /><InputError
-                            id="departure-error"
+                            :id="fieldId('departure-error')"
                             :message="form.errors.departure"
                         />
                     </div>
                 </div>
                 <div class="field">
-                    <Label for="guests">{{ text('form_guests') }} *</Label
+                    <Label :for="fieldId('guests')"
+                        >{{ text('form_guests') }} *</Label
                     ><Input
-                        id="guests"
+                        :id="fieldId('guests')"
                         v-model="form.guests"
                         name="guests"
                         type="number"
@@ -184,31 +220,35 @@ function submit(): void {
                         max="1000"
                         required
                         :aria-invalid="!!form.errors.guests"
-                        aria-describedby="guests-error"
+                        :aria-describedby="fieldId('guests-error')"
                     /><InputError
-                        id="guests-error"
+                        :id="fieldId('guests-error')"
                         :message="form.errors.guests"
                     />
                 </div>
             </template>
             <div class="field">
-                <Label for="name">{{ text('form_name') }} *</Label
+                <Label :for="fieldId('name')">{{ text('form_name') }} *</Label
                 ><Input
-                    id="name"
+                    :id="fieldId('name')"
                     v-model="form.name"
                     name="name"
                     autocomplete="name"
                     required
                     maxlength="180"
                     :aria-invalid="!!form.errors.name"
-                    aria-describedby="name-error"
-                /><InputError id="name-error" :message="form.errors.name" />
+                    :aria-describedby="fieldId('name-error')"
+                /><InputError
+                    :id="fieldId('name-error')"
+                    :message="form.errors.name"
+                />
             </div>
             <div class="grid gap-6 sm:grid-cols-2">
                 <div class="field">
-                    <Label for="email">{{ text('form_email') }} *</Label
+                    <Label :for="fieldId('email')"
+                        >{{ text('form_email') }} *</Label
                     ><Input
-                        id="email"
+                        :id="fieldId('email')"
                         v-model="form.email"
                         name="email"
                         type="email"
@@ -217,16 +257,17 @@ function submit(): void {
                         required
                         maxlength="254"
                         :aria-invalid="!!form.errors.email"
-                        aria-describedby="email-error"
+                        :aria-describedby="fieldId('email-error')"
                     /><InputError
-                        id="email-error"
+                        :id="fieldId('email-error')"
                         :message="form.errors.email"
                     />
                 </div>
                 <div class="field">
-                    <Label for="phone">{{ text('form_phone') }} *</Label
+                    <Label :for="fieldId('phone')"
+                        >{{ text('form_phone') }} *</Label
                     ><Input
-                        id="phone"
+                        :id="fieldId('phone')"
                         v-model="form.phone"
                         name="phone"
                         type="tel"
@@ -237,36 +278,44 @@ function submit(): void {
                         :aria-invalid="!!form.errors.phone"
                         aria-describedby="phone-hint phone-error"
                     />
-                    <p id="phone-hint" class="resort-muted text-sm">
+                    <p :id="fieldId('phone-hint')" class="resort-muted text-sm">
                         {{ text('form_phone_hint') }}
                     </p>
-                    <InputError id="phone-error" :message="form.errors.phone" />
+                    <InputError
+                        :id="fieldId('phone-error')"
+                        :message="form.errors.phone"
+                    />
                 </div>
             </div>
             <div class="field">
-                <Label for="message">{{
+                <Label :for="fieldId('message')">{{
                     booking
                         ? text('form_booking_message')
-                        : text('form_enquiry_message')
+                        : context
+                          ? systemText(
+                                'Details (optional)',
+                                'التفاصيل (اختياري)',
+                            )
+                          : text('form_enquiry_message')
                 }}</Label
                 ><textarea
-                    id="message"
+                    :id="fieldId('message')"
                     v-model="form.message"
                     name="message"
                     rows="4"
                     maxlength="5000"
-                    :required="!booking"
+                    :required="!booking && !context"
                     :aria-invalid="!!form.errors.message"
-                    aria-describedby="message-error"
+                    :aria-describedby="fieldId('message-error')"
                 /><InputError
-                    id="message-error"
+                    :id="fieldId('message-error')"
                     :message="form.errors.message"
                 />
             </div>
             <div class="hidden" aria-hidden="true">
-                <label for="company">Company</label
+                <label :for="fieldId('company')">Company</label
                 ><input
-                    id="company"
+                    :id="fieldId('company')"
                     v-model="form.company"
                     name="company"
                     tabindex="-1"
@@ -282,7 +331,7 @@ function submit(): void {
                         required
                         class="mt-1 size-5 shrink-0 accent-[#276a70]"
                         :aria-invalid="!!form.errors.privacy"
-                        aria-describedby="privacy-error"
+                        :aria-describedby="fieldId('privacy-error')"
                     /><span
                         >{{ text('form_consent') }}
                         <Link
@@ -294,7 +343,7 @@ function submit(): void {
                         ></span
                     ></label
                 ><InputError
-                    id="privacy-error"
+                    :id="fieldId('privacy-error')"
                     :message="form.errors.privacy"
                 />
             </div>
@@ -318,6 +367,7 @@ function submit(): void {
                     )
                 }}
             </p>
+            <slot name="direct" :data="form" />
         </fieldset>
     </form>
 </template>

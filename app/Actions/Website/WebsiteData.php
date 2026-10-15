@@ -50,8 +50,8 @@ class WebsiteData
         $profileRecord = ResortProfile::query()->where('key', 'main')->first();
         $profile = ($preview instanceof ResortProfile ? $preview->draft : ($localPreview ? $profileRecord?->draft : $profileRecord?->published)) ?? [];
         $previewMediaIds = match (true) {
-            $preview instanceof Accommodation => $preview->draft['media_ids'] ?? [],
-            $preview instanceof ResortProfile => [$preview->draft['hero_media_id'] ?? null, $preview->draft['logo_light_media_id'] ?? null, $preview->draft['logo_dark_media_id'] ?? null, $preview->draft['promotion_media_id'] ?? null],
+            $preview instanceof Accommodation => [...($preview->draft['media_ids'] ?? []), ...($preview->draft['redesign']['media_ids'] ?? [])],
+            $preview instanceof ResortProfile => [$preview->draft['hero_media_id'] ?? null, $preview->draft['logo_light_media_id'] ?? null, $preview->draft['logo_dark_media_id'] ?? null, $preview->draft['promotion_media_id'] ?? null, ...array_values($preview->draft['redesign']['media'] ?? []), ...($preview->draft['redesign']['gallery_media_ids'] ?? [])],
             default => [],
         };
         $media = [];
@@ -74,11 +74,12 @@ class WebsiteData
                 'width' => $variants[960]['width'], 'height' => $variants[960]['height'],
                 'alt' => data_get($content, 'alt.'.$locale, ''), 'caption' => data_get($content, 'caption.'.$locale, ''),
                 'position' => ($content['focal_x'] ?? 50).'% '.($content['focal_y'] ?? 50).'%', 'order' => (int) ($content['sort_order'] ?? 0),
+                'category' => $content['category'] ?? 'resort', 'galleryVisible' => $content['gallery_visible'] ?? true,
             ];
         }
         uasort($media, fn (array $a, array $b): int => [$a['order'], $a['id']] <=> [$b['order'], $b['id']]);
         $logoIds = array_filter([$profile['logo_light_media_id'] ?? null, $profile['logo_dark_media_id'] ?? null]);
-        $gallery = array_diff_key($media, array_flip([...$logoIds, $profile['promotion_media_id'] ?? 0]));
+        $gallery = array_filter(array_diff_key($media, array_flip([...$logoIds, $profile['promotion_media_id'] ?? 0])), fn (array $image): bool => $image['galleryVisible']);
         $promotion = null;
         $promotionProfile = $preview instanceof ResortProfile ? $preview : $profileRecord;
         $promotionImage = $media[$profile['promotion_media_id'] ?? 0] ?? null;
@@ -99,9 +100,23 @@ class WebsiteData
                 continue;
             }
             $images = array_values(array_intersect_key($media, array_flip($content['media_ids'] ?? [])));
+            if (isset($content['redesign']['media_ids'])) {
+                $images = [];
+                foreach (array_unique($content['redesign']['media_ids']) as $id) {
+                    if (isset($media[$id])) {
+                        $images[] = $media[$id];
+                    }
+                }
+            }
+            $presentation = $content['redesign'] ?? [];
             $accommodations[] = ['id' => $record->id, 'slug' => $record->slug,
-                'title' => data_get($content, 'title.'.$locale, ''), 'description' => data_get($content, 'description.'.$locale, ''),
-                'inclusions' => data_get($content, 'inclusions.'.$locale, ''), 'capacity' => $content['capacity'] ?? null,
+                'title' => data_get($presentation, 'title.'.$locale, data_get($content, 'title.'.$locale, '')),
+                'description' => data_get($presentation, 'overview.'.$locale, data_get($content, 'description.'.$locale, '')),
+                'inclusions' => data_get($presentation, 'inclusions.'.$locale, data_get($content, 'inclusions.'.$locale, '')), 'capacity' => $content['capacity'] ?? null,
+                'shortDescription' => data_get($presentation, 'description.'.$locale, data_get($content, 'description.'.$locale, '')),
+                'badge' => data_get($presentation, 'badge.'.$locale, ''), 'facts' => data_get($presentation, 'facts.'.$locale, ''),
+                'categories' => $presentation['categories'] ?? [], 'sourcePage' => $presentation['page'] ?? null,
+                'capacityBasis' => $content['capacity_basis'] ?? 'guests',
                 'images' => $images, 'order' => (int) ($content['sort_order'] ?? 0), 'published' => $record->published_at !== null,
             ];
         }
@@ -138,6 +153,7 @@ class WebsiteData
             'media' => array_values($gallery), 'accommodations' => $accommodations, 'faqs' => $faqs,
             'acceptsRequests' => ! $preview && ! $localPreview && $this->acceptsRequests(),
             'indexable' => ! $preview && $this->isIndexable(),
+            'redesign' => WebsiteRedesign::forLocale($profile, $media, $locale),
         ];
     }
 }

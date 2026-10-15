@@ -58,3 +58,22 @@ test('invalid images fail without becoming publishable', function () {
     expect(fn () => (new ProcessWebsiteImage($asset->id))->handle(app(ProcessImage::class)))->toThrow(RuntimeException::class);
     expect($asset->fresh()->processing_status)->toBe('failed')->and($asset->fresh()->published)->toBeNull();
 });
+
+test('responsive artwork preserves transparent pixels against dark backgrounds', function () {
+    $image = imagecreatetruecolor(20, 20);
+    imagealphablending($image, false);
+    imagesavealpha($image, true);
+    imagefill($image, 0, 0, imagecolorallocatealpha($image, 255, 255, 255, 127));
+    imagefilledrectangle($image, 8, 8, 12, 12, imagecolorallocatealpha($image, 255, 255, 255, 0));
+    ob_start();
+    imagepng($image);
+    $bytes = ob_get_clean();
+    Storage::disk('local')->put('website/originals/artwork.png', $bytes);
+    $asset = MediaAsset::factory()->create(['original_path' => 'website/originals/artwork.png']);
+
+    app(ProcessImage::class)->handle($asset);
+
+    $variant = imagecreatefromstring(Storage::disk('local')->get($asset->variants[960]['path']));
+    expect(imagecolorsforindex($variant, imagecolorat($variant, 0, 0))['alpha'])->toBe(127);
+    expect(imagecolorsforindex($variant, imagecolorat($variant, 10, 10))['alpha'])->toBe(0);
+});

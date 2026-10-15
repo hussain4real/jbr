@@ -12,6 +12,28 @@ export default defineConfig({
             input: ['resources/css/app.css', 'resources/js/app.ts'],
             refresh: true,
             fonts: [
+                google('Libre Caslon Display', {
+                    preload: false,
+                    optimizedFallbacks: false,
+                    weights: [400],
+                }),
+                google('Hanken Grotesk', {
+                    preload: false,
+                    optimizedFallbacks: false,
+                    weights: [400, 500, 600, 700],
+                }),
+                google('Amiri', {
+                    subsets: ['latin', 'arabic'],
+                    preload: false,
+                    optimizedFallbacks: false,
+                    weights: [400, 700],
+                }),
+                google('IBM Plex Sans Arabic', {
+                    subsets: ['latin', 'arabic'],
+                    preload: false,
+                    optimizedFallbacks: false,
+                    weights: [400, 500, 600, 700],
+                }),
                 google('El Messiri', {
                     subsets: ['latin', 'arabic'],
                     preload: false,

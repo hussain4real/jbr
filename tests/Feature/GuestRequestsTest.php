@@ -135,3 +135,38 @@ test('storage failure never produces a success receipt', function () {
     $this->post('/en/booking-requests', guestPayload($token))->assertSessionHasErrors('form')->assertSessionMissing('website_receipt');
     expect(GuestRequest::query()->count())->toBe(0);
 });
+
+test('global planning panels receive separate session-bound booking and enquiry tokens', function () {
+    $response = $this->get('/en');
+    $tokens = $response->inertiaProps('submissionTokens');
+    $this->withCookie(config('session.cookie'), session()->getId());
+
+    $this->post('/en/enquiries', [...guestPayload($tokens['enquiry'], false), 'message' => "A sports team or training camp\nGroup size: 80+"])->assertSessionHasNoErrors()->assertRedirect('/en/request-received');
+
+    expect(GuestRequest::query()->sole()->message)->toBe("A sports team or training camp\nGroup size: 80+");
+    expect(GuestRequest::query()->sole()->guests)->toBeNull();
+    $response->assertHeader('Cache-Control', 'no-store, private');
+    $this->post('/en/enquiries', guestPayload($tokens['booking'], false))->assertSessionHasErrors('form');
+});
+
+test('enquiry dates preserve flexible enquiries and reject incomplete or reversed dates', function (array $dates, bool $valid) {
+    $token = guestFormToken($this, '/en/contact');
+
+    $response = $this->post('/en/enquiries', [...guestPayload($token, false), ...$dates]);
+
+    if ($valid) {
+        $response->assertSessionHasNoErrors();
+        expect(GuestRequest::query()->sole()->arrival?->toDateString())->toBe('2099-01-01');
+        expect(GuestRequest::query()->sole()->departure?->toDateString())->toBe('2099-01-03');
+    } else {
+        $response->assertSessionHasErrors();
+        $this->assertDatabaseCount('guest_requests', 0);
+        Queue::assertNothingPushed();
+    }
+})->with([
+    'both dates' => [['arrival' => '2099-01-01', 'departure' => '2099-01-03'], true],
+    'arrival only' => [['arrival' => '2099-01-01'], false],
+    'departure only' => [['departure' => '2099-01-03'], false],
+    'reversed dates' => [['arrival' => '2099-01-03', 'departure' => '2099-01-01'], false],
+    'past dates' => [['arrival' => '2001-01-01', 'departure' => '2001-01-03'], false],
+]);
