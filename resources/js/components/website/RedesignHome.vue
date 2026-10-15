@@ -964,11 +964,5 @@ onUnmounted(() => window.removeEventListener('resize', updateCarousel));
                 </div>
             </div>
         </section>
-        <script type="application/ld+json">
-                            {{ text('12_script_0') }}
-                        const galleryKeys = ["hero", "sun-villa", "stadium", "dusk-tree", "playground", "bridge"];
-                    onMounted(() => { updateCarousel(); window.addEventListener('resize', updateCarousel); });
-            onUnmounted(() => window.removeEventListener('resize', updateCarousel));
-        </script>
     </div>
 </template>
