@@ -6,6 +6,7 @@ use App\Actions\Website\WebsiteRedesign;
 use App\Models\Accommodation;
 use App\Models\MediaAsset;
 use App\Models\ResortProfile;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -26,12 +27,19 @@ class WebsiteRedesignEditor
             }
             $fields = [Toggle::make('draft.redesign.pages.'.$key.'.enabled')->label('Show this page')];
             foreach (['title' => 'Search title', 'description' => 'Search description'] as $field => $label) {
-                array_push($fields, ...self::translated('redesign.pages.'.$key.'.'.$field, $label, 2));
+                array_push($fields, ...self::translated('redesign.pages.'.$key.'.'.$field, $label, 2, $key === 'home' && $field === 'description'));
             }
             foreach ($page['copy'] as $field => $translations) {
-                array_push($fields, ...self::translated('redesign.pages.'.$key.'.copy.'.$field, Str::limit($translations['en'], 80), mb_strlen($translations['en']) > 120 ? 4 : 2));
+                $shared = ($key === 'home' && in_array($field, WebsiteRedesign::HOME_INTRODUCTION_COPY, true))
+                    || ($key === 'contact' && $field === WebsiteRedesign::CONTACT_ARRIVAL_COPY);
+                array_push($fields, ...self::translated('redesign.pages.'.$key.'.copy.'.$field, Str::limit($translations['en'], 80), mb_strlen($translations['en']) > 120 ? 4 : 2, $shared));
             }
-            $pages[] = Section::make(Str::headline($key))->schema($fields)->columns(2)->collapsed();
+            $description = match ($key) {
+                'home' => 'Edit the welcome introduction and homepage search description in Resort information and publishing. Other homepage text is edited here.',
+                'contact' => 'Edit arrival directions and contact details in Resort information and publishing. Other location page text is edited here.',
+                default => null,
+            };
+            $pages[] = Section::make(Str::headline($key))->description($description)->schema($fields)->columns(2)->collapsed();
         }
         $images = [];
         $mediaOptions = MediaAsset::query()->get()->mapWithKeys(fn (MediaAsset $asset): array => [$asset->id => data_get($asset->draft, 'caption.en', 'Image '.$asset->id)])->all();
@@ -71,9 +79,13 @@ class WebsiteRedesignEditor
             ->visible(fn (?Accommodation $record): bool => isset($record?->draft['redesign']))];
     }
 
-    /** @return array<Textarea> */
-    private static function translated(string $path, string $label, int $rows = 3): array
+    /** @return array<Textarea|Hidden> */
+    private static function translated(string $path, string $label, int $rows = 3, bool $shared = false): array
     {
+        if ($shared) {
+            return array_map(fn (string $locale): Hidden => Hidden::make('draft.'.$path.'.'.$locale), ['en', 'ar']);
+        }
+
         return array_map(fn (string $locale): Textarea => Textarea::make('draft.'.$path.'.'.$locale)
             ->label($label.' · '.($locale === 'ar' ? 'العربية' : 'English'))->rows($rows)->maxLength(8000)
             ->extraInputAttributes(['dir' => $locale === 'ar' ? 'rtl' : 'ltr', 'lang' => $locale]), ['en', 'ar']);

@@ -107,10 +107,14 @@ onUnmounted(() => window.removeEventListener('resize', updateCarousel));
                     <h2>
                         {{ text('2_section_0_div_0_div_1_h2_0') }}
                     </h2>
-                    <p class="lede">
+                    <p v-if="text('2_section_0_div_0_div_2_p_0')" class="lede">
                         {{ text('2_section_0_div_0_div_2_p_0') }}
                     </p>
-                    <p class="lede">
+                    <p
+                        v-if="text('2_section_0_div_0_div_3_p_0')"
+                        class="lede"
+                        style="white-space: pre-line"
+                    >
                         {{ text('2_section_0_div_0_div_3_p_0') }}
                     </p>
                     <p

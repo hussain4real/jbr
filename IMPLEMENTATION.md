@@ -400,3 +400,25 @@ The user authorized one real test submission and both notification emails, choos
 - Production request acceptance, mail delivery, privacy approval, operating-process approval and the approved **90-day** retention setting remain enabled. The completed test request **ID 3** remains `closed`, with both notification statuses `sent`; the queue has **0 pending jobs and 0 failed jobs**.
 
 These post-deployment checks did not create another guest request or send additional notification emails. The independent guest/staff delivery evidence remains recorded in the live test booking section above.
+
+## PR #22 deployment and latest live health — 15 October 2026
+
+[PR #22](https://github.com/hussain4real/jbr/pull/22) merged after its required CI passed, as `e19dadc730f6f215e04c96a46f365ee586262b2e`. The [post-merge workflow](https://github.com/hussain4real/jbr/actions/runs/38690715441) completed successfully: `ci`, `deployment-eligibility` and `deploy` all passed. Deployment reported healthy at **09:12:25 Qatar time** (06:12:25 UTC).
+
+- The independently checked active server `REVISION` matches PR #22's merge commit exactly. No migrations were pending. The deployment's SSR readiness retry succeeded, followed by passing `/up`, `/en` and `/ar` checks.
+- Fresh service checks confirmed `nginx`, `php8.5-fpm` and `cron` are active, and supervised `jbr-queue` and `jbr-ssr` processes are running.
+- Fresh public HTTPS checks returned **200** for `/up`, `/en`, `/ar`, `/en/request-a-booking`, `/ar/request-a-booking`, `/en/privacy` and `/ar/privacy`. All six content pages contain server-rendered markup, with RTL direction retained on Arabic pages.
+- Fresh browser checks confirmed both language versions of the booking form render with enabled submit buttons and privacy consent. No warnings/errors were captured during this checked flow; the Arabic form had no horizontal overflow or broken loaded images.
+- Request acceptance and mail remain enabled, notification routing remains configured, and published privacy/operations approvals and **90-day** retention remain intact. All **40** redesign media assets remain published. Test request **ID 3** remains `closed`, both notification statuses remain `sent`, and the queue has **0 pending jobs and 0 failed jobs**.
+
+This verification created no additional guest request or notification email. It confirms post-deployment availability and settings; the independently verified email deliveries are the earlier live test recorded above.
+
+## Shared CMS copy publication fix — 15 October 2026
+
+Lahusseine reported that replacing “Wahiba Sands” with “Al Sharqiyah Sands” and publishing did not update the website. Read-only production inspection confirmed that `introduction.en`, `arrival.en` and `seo_description.en` were saved in both draft and published snapshots at **11:28:06 Qatar time**. The v2 page copy still contained the source wording: the redesign read duplicate page fields instead of these shared CMS fields.
+
+- Local fix: the redesign now reads the selected draft/published snapshot's shared introduction for the homepage welcome paragraphs, shared arrival directions for the location page, and shared search description for homepage metadata. Missing shared fields retain the v2 fallback; explicitly empty shared fields clear duplicate text. Additional introduction paragraphs remain visible and a missing second paragraph does not leave an empty block.
+- Removed duplicate editable controls for those v2 values while preserving their stored fallback data. The editor now directs staff to the shared fields and labels their public destinations. Other page-specific text remains editable in Website v2 redesign.
+- Regression coverage exercises staff save, signed preview, bilingual publication and subsequent public homepage/location responses, while checking that saved drafts do not alter the public snapshot. Local validation: **43 affected tests passed, 454 assertions**; frontend format/lint, Vue TypeScript, PHPStan, Pint and client/SSR builds passed.
+- Full local validation before release: `composer ci:check` passed with **255 tests passed, 2 skipped, 1,707 assertions**. The four JavaScript setup-link tests also passed. The client and SSR production builds passed during the fix validation.
+- The saved production edits were preserved; no production content was changed during diagnosis. This code fix is local and awaits CI/release and verification of Lahusseine's existing edits on the live pages.

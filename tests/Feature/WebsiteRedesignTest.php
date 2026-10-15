@@ -178,6 +178,69 @@ test('staff can add published photos to the v2 gallery without changing the curr
     expect(app(WebsiteData::class)->forLocale('en')['redesign']['gallery'][0]['id'])->toBe($image->id);
 });
 
+test('shared resort edits appear in v2 preview and public copy only after staff publishes', function (string $locale) {
+    Filament::setCurrentPanel(Filament::getPanel('admin'));
+    $this->actingAs(User::factory()->create(['is_staff' => true]), 'resort');
+    $profile = prepareWebsiteRedesign();
+    $draft = $profile->draft;
+    $draft['redesign']['pages']['contact'] = WebsiteRedesign::source()['pages']['contact'];
+    $draft['introduction'] = ['en' => "Original welcome.\n\nOriginal second paragraph.", 'ar' => "ترحيب أصلي.\n\nفقرة ثانية أصلية."];
+    $draft['arrival'] = ['en' => 'Original directions.', 'ar' => 'اتجاهات أصلية.'];
+    $draft['seo_description'] = ['en' => 'Original search description.', 'ar' => 'وصف بحث أصلي.'];
+    $profile->update(['draft' => $draft]);
+    $profile->publish();
+    $published = $profile->published;
+    $draft['introduction'] = ['en' => "Welcome to Al Sharqiyah Sands.\n\nSecond paragraph.\n\nThird paragraph.", 'ar' => "أهلاً بكم في رمال الشرقية.\n\nالفقرة الثانية.\n\nالفقرة الثالثة."];
+    $draft['arrival'] = ['en' => 'Arrive at Al Sharqiyah Sands.', 'ar' => 'الوصول إلى رمال الشرقية.'];
+    $draft['seo_description'] = ['en' => 'A resort in Al Sharqiyah Sands.', 'ar' => 'منتجع في رمال الشرقية.'];
+
+    Livewire::test(ManageResortProfiles::class)
+        ->callAction(TestAction::make('edit')->table($profile), ['draft' => $draft])
+        ->assertHasNoActionErrors();
+
+    expect($profile->fresh()->published)->toEqual($published);
+    $this->get('/'.$locale)->assertInertia(fn (Assert $page) => $page
+        ->where('redesign.pages.home.description', $locale === 'en' ? 'Original search description.' : 'وصف بحث أصلي.')
+        ->where('redesign.pages.home.copy.2_section_0_div_0_div_2_p_0', $locale === 'en' ? 'Original welcome.' : 'ترحيب أصلي.'));
+    $preview = URL::temporarySignedRoute('website.preview', now()->addMinutes(10), ['locale' => $locale, 'type' => 'profile', 'record' => $profile->id]);
+    $this->get($preview)->assertInertia(fn (Assert $page) => $page
+        ->where('isPreview', true)
+        ->where('redesign.pages.home.copy.2_section_0_div_0_div_2_p_0', $locale === 'en' ? 'Welcome to Al Sharqiyah Sands.' : 'أهلاً بكم في رمال الشرقية.')
+        ->where('redesign.pages.contact.copy.2_section_0_div_0_div_0_p_0', $draft['arrival'][$locale]));
+
+    Livewire::test(ManageResortProfiles::class)
+        ->callAction(TestAction::make('publish')->table($profile))
+        ->assertHasNoActionErrors()->assertNotified('Published in both languages');
+
+    $this->get('/'.$locale)->assertInertia(fn (Assert $page) => $page
+        ->where('redesign.pages.home.description', $draft['seo_description'][$locale])
+        ->where('redesign.pages.home.copy.2_section_0_div_0_div_2_p_0', $locale === 'en' ? 'Welcome to Al Sharqiyah Sands.' : 'أهلاً بكم في رمال الشرقية.')
+        ->where('redesign.pages.home.copy.2_section_0_div_0_div_3_p_0', $locale === 'en' ? "Second paragraph.\n\nThird paragraph." : "الفقرة الثانية.\n\nالفقرة الثالثة."));
+    $this->get('/'.$locale.'/contact')->assertInertia(fn (Assert $page) => $page
+        ->where('redesign.pages.contact.copy.2_section_0_div_0_div_0_p_0', $draft['arrival'][$locale]));
+    expect($profile->fresh()->published['redesign']['pages']['home']['copy'])->toEqual($published['redesign']['pages']['home']['copy']);
+})->with(['en', 'ar']);
+
+test('v2 copy remains available without shared fields and explicit empty shared fields clear duplicate text', function () {
+    $source = WebsiteRedesign::source();
+    $profile = ['redesign' => ['pages' => ['home' => $source['pages']['home'], 'contact' => $source['pages']['contact']]]];
+
+    $fallback = WebsiteRedesign::forLocale($profile, [], 'en');
+
+    expect($fallback['pages']['home']['description'])->toBe($source['pages']['home']['description']['en']);
+    expect($fallback['pages']['contact']['copy']['2_section_0_div_0_div_0_p_0'])->toBe($source['pages']['contact']['copy']['2_section_0_div_0_div_0_p_0']['en']);
+    $profile['introduction'] = ['en' => 'One paragraph.'];
+    $profile['arrival'] = ['en' => ''];
+    $profile['seo_description'] = ['en' => ''];
+
+    $shared = WebsiteRedesign::forLocale($profile, [], 'en');
+
+    expect($shared['pages']['home']['description'])->toBe('');
+    expect($shared['pages']['home']['copy']['2_section_0_div_0_div_2_p_0'])->toBe('One paragraph.');
+    expect($shared['pages']['home']['copy']['2_section_0_div_0_div_3_p_0'])->toBe('');
+    expect($shared['pages']['contact']['copy']['2_section_0_div_0_div_0_p_0'])->toBe('');
+});
+
 test('gallery selections preserve order and exclude images removed from gallery publication', function () {
     Queue::fake();
     $profile = prepareWebsiteRedesign();

@@ -7,6 +7,10 @@ use RuntimeException;
 
 class WebsiteRedesign
 {
+    public const HOME_INTRODUCTION_COPY = ['2_section_0_div_0_div_2_p_0', '2_section_0_div_0_div_3_p_0'];
+
+    public const CONTACT_ARRIVAL_COPY = '2_section_0_div_0_div_0_p_0';
+
     /** @return array<string, mixed> */
     public static function source(): array
     {
@@ -91,6 +95,22 @@ class WebsiteRedesign
                 'description' => data_get($page, 'description.'.$locale, ''),
                 'copy' => array_map(fn (array $text): string => $text[$locale] ?? '', $page['copy'] ?? []),
             ];
+        }
+        if (isset($pages['home'])) {
+            $introduction = data_get($profile, 'introduction.'.$locale);
+            if (is_string($introduction)) {
+                $paragraphs = preg_split('/\R\s*\R/u', trim($introduction)) ?: [];
+                $pages['home']['copy'][self::HOME_INTRODUCTION_COPY[0]] = array_shift($paragraphs) ?? '';
+                $pages['home']['copy'][self::HOME_INTRODUCTION_COPY[1]] = implode("\n\n", $paragraphs);
+            }
+            $description = data_get($profile, 'seo_description.'.$locale);
+            if (is_string($description)) {
+                $pages['home']['description'] = $description;
+            }
+        }
+        $arrival = data_get($profile, 'arrival.'.$locale);
+        if (isset($pages['contact']) && is_string($arrival)) {
+            $pages['contact']['copy'][self::CONTACT_ARRIVAL_COPY] = $arrival;
         }
         $images = [];
         foreach ($redesign['media'] ?? [] as $key => $id) {
