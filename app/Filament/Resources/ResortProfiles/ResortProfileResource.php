@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ResortProfiles;
 
 use App\Filament\ContentEditor;
 use App\Filament\Resources\ResortProfiles\Pages\ManageResortProfiles;
+use App\Filament\WebsiteRedesignEditor;
 use App\Models\MediaAsset;
 use App\Models\ResortProfile;
 use BackedEnum;
@@ -28,6 +29,7 @@ class ResortProfileResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
+            ...WebsiteRedesignEditor::profile(),
             Section::make('Homepage promotion')->description('Show an original poster below the main banner. Upload and publish the poster in Media Assets first. Save your changes as a draft, preview, then publish. Turning this off also removes the public PDF download when you publish.')->schema([
                 Toggle::make('draft.promotion_enabled')->label('Show promotion on homepage')->default(false),
                 Select::make('draft.promotion_media_id')->label('Promotion poster')->options(fn (): array => MediaAsset::query()->whereNotNull('published_at')->get()->mapWithKeys(fn (MediaAsset $media): array => [$media->id => data_get($media->published, 'caption.en', 'Image '.$media->id)])->all())->helperText('Displayed in full without cropping; excluded from the property photo gallery.'),
@@ -61,7 +63,7 @@ class ResortProfileResource extends Resource
                 Select::make('draft.logo_light_media_id')->label('Logo for light backgrounds')->options(fn (): array => MediaAsset::query()->get()->mapWithKeys(fn (MediaAsset $media): array => [$media->id => data_get($media->draft, 'caption.en', 'Image '.$media->id)])->all()),
                 Select::make('draft.logo_dark_media_id')->label('Logo for dark backgrounds')->options(fn (): array => MediaAsset::query()->get()->mapWithKeys(fn (MediaAsset $media): array => [$media->id => data_get($media->draft, 'caption.en', 'Image '.$media->id)])->all()),
             ])->columns(2)->columnSpanFull()->collapsed(),
-            Section::make('Website text')->description('Edit headings, descriptions, navigation, buttons, form labels and footer text in both languages. Existing copy is supplied as a starting point. Technical error messages and booking-status notices remain system controlled. Save, preview and publish after reviewing both languages.')->schema(ContentEditor::websiteCopy())->columnSpanFull()->collapsed(),
+            Section::make('Shared form labels and original website text')->description('Form labels apply to both designs. Original website headings are used on fallback pages; edit v2 marketing page text in Website v2 redesign. Technical errors and booking-status notices remain system controlled. Save, preview and publish after reviewing both languages.')->schema(ContentEditor::websiteCopy())->columnSpanFull()->collapsed(),
         ]);
     }
 

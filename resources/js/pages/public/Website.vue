@@ -509,7 +509,11 @@ const structuredData = computed(() =>
                             <p v-if="item.capacity" class="resort-muted">
                                 {{ text('accommodation_capacity_prefix') }}
                                 {{ item.capacity }}
-                                {{ text('accommodation_capacity_suffix') }}
+                                {{
+                                    item.capacityBasis === 'adults'
+                                        ? systemText('adults', 'بالغين')
+                                        : text('accommodation_capacity_suffix')
+                                }}
                             </p>
                         </article>
                     </div>
@@ -607,7 +611,11 @@ const structuredData = computed(() =>
                         <p v-if="item.capacity" class="mt-3 text-sm">
                             {{ text('accommodation_capacity_prefix') }}
                             {{ item.capacity }}
-                            {{ text('accommodation_capacity_suffix') }}
+                            {{
+                                item.capacityBasis === 'adults'
+                                    ? systemText('adults', 'بالغين')
+                                    : text('accommodation_capacity_suffix')
+                            }}
                         </p>
                         <Link
                             :href="requestLink(item)"
@@ -661,7 +669,11 @@ const structuredData = computed(() =>
                             <p v-if="stay.capacity">
                                 {{ text('accommodation_capacity_prefix') }}
                                 {{ stay.capacity }}
-                                {{ text('accommodation_capacity_suffix') }}
+                                {{
+                                    stay.capacityBasis === 'adults'
+                                        ? systemText('adults', 'بالغين')
+                                        : text('accommodation_capacity_suffix')
+                                }}
                             </p>
                             <p>
                                 {{ text('accommodation_booking_description') }}

@@ -3,6 +3,7 @@
 return [
     'name' => 'Jawharat Bidiyah Resort',
     'local_preview' => env('WEBSITE_LOCAL_PREVIEW', false),
+    'preview_build' => env('WEBSITE_PREVIEW_BUILD', false),
     'timezone' => 'Asia/Muscat',
     'accept_requests' => env('WEBSITE_ACCEPT_REQUESTS', false),
     'mail_enabled' => env('WEBSITE_MAIL_ENABLED', false),

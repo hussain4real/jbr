@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Actions\Website\WebsiteCopy;
+use App\Actions\Website\WebsiteRedesign;
 use App\Concerns\PublishesWebsiteContent;
 use Closure;
 use Database\Factories\ResortProfileFactory;
@@ -86,7 +87,7 @@ class ResortProfile extends Model
             $rules['retention_days'] = 'required|integer|min:1|max:3650';
         }
 
-        return $rules;
+        return [...$rules, ...WebsiteRedesign::publicationRules($this->draft)];
     }
 
     public function promotionPdfPath(bool $draft = false): ?string

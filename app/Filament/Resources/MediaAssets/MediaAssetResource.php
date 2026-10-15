@@ -9,6 +9,7 @@ use App\Models\MediaAsset;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
@@ -28,10 +29,12 @@ class MediaAssetResource extends Resource
         return $schema->components([FileUpload::make('original_path')->label('Original photograph')->disk('local')->directory('website/originals')->visibility('private')->preventFilePathTampering()->image()->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])->maxSize(12288)->required()->helperText('Up to 12 MB. Originals stay private; a queue worker creates web versions. Replacing a photograph keeps the old published image until you publish again.'),
             ...ContentEditor::translated('caption', 'Caption', 2),
             ...ContentEditor::translated('alt', 'Accessible image description', 2),
+            Select::make('draft.category')->label('Gallery category')->options(['resort' => 'Resort', 'villas' => 'Villas', 'dining' => 'Dining', 'sport' => 'Sport', 'desert' => 'Desert'])->default('resort'),
+            Toggle::make('draft.gallery_visible')->label('Include in public gallery')->default(true),
             TextInput::make('draft.focal_x')->label('Horizontal focal point (%)')->integer()->minValue(0)->maxValue(100)->default(50)->required(),
             TextInput::make('draft.focal_y')->label('Vertical focal point (%)')->integer()->minValue(0)->maxValue(100)->default(50)->required(),
             Toggle::make('draft.rights_confirmed')->label('Publication rights confirmed')->default(false),
-            Toggle::make('draft.property_verified')->label('Accurately represents the resort')->default(false),
+            Toggle::make('draft.property_verified')->label('Accurately represents the resort or advertised activity')->default(false),
             ...ContentEditor::approvals(false), ])->columns(2);
     }
 

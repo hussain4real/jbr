@@ -1,4 +1,10 @@
 export type Locale = 'en' | 'ar';
+export interface RequestDetails {
+    accommodation_id: string | number;
+    arrival: string;
+    departure: string;
+    guests: number | string;
+}
 export interface ResortImage {
     id: number;
     src: string;
@@ -9,6 +15,8 @@ export interface ResortImage {
     alt: string;
     caption: string;
     position: string;
+    category?: string;
+    galleryVisible?: boolean;
 }
 export interface Accommodation {
     id: number;
@@ -17,8 +25,14 @@ export interface Accommodation {
     description: string;
     inclusions: string;
     capacity: number | null;
+    capacityBasis?: 'guests' | 'adults';
     images: ResortImage[];
     published: boolean;
+    shortDescription?: string;
+    badge?: string;
+    facts?: string;
+    categories?: string[];
+    sourcePage?: string | null;
 }
 export interface ResortPromotion {
     title: string;
@@ -51,3 +65,37 @@ export type WebsitePage =
     | 'booking'
     | 'privacy'
     | 'received';
+
+export interface RedesignContent {
+    revision: string;
+    pages: Record<
+        string,
+        { title: string; description: string; copy: Record<string, string> }
+    >;
+    images: Record<string, ResortImage>;
+    gallery: ResortImage[];
+}
+export interface WebsiteProps {
+    locale: Locale;
+    copy: Record<string, string>;
+    page: WebsitePage | 'experiences' | 'dining' | 'sport' | 'schools';
+    profile: ResortProfile;
+    hero: ResortImage | null;
+    promotion: ResortPromotion | null;
+    branding: { light: ResortImage | null; dark: ResortImage | null };
+    media: ResortImage[];
+    accommodations: Accommodation[];
+    faqs: { id: number; question: string; answer: string }[];
+    stay: Accommodation | null;
+    receipt: { reference: string; kind: string } | null;
+    isPreview: boolean;
+    acceptsRequests: boolean;
+    indexable: boolean;
+    alternateUrl: string;
+    canonicalUrl: string;
+    submissionToken: string | null;
+    submissionTokens: { booking: string; enquiry: string };
+    selectedAccommodation: string | null;
+    today: string;
+    redesign: RedesignContent;
+}

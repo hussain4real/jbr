@@ -35,6 +35,12 @@
             <link rel="apple-touch-icon" href="/images/image.png">
         @endif
 
+        @php
+            if (\App\Actions\Website\WebsiteData::localPreview() && config('website.preview_build')) {
+                \Illuminate\Support\Facades\Vite::useHotFile(storage_path('framework/cache/website-preview-build.hot'));
+            }
+        @endphp
+
         @fonts
 
         @vite(['resources/css/app.css', 'resources/js/app.ts', "resources/js/pages/{$page['component']}.vue"])

@@ -23,7 +23,7 @@ class StoreGuestRequest
             ['submission_hash' => hash('sha256', $token['id'].':'.$token['session'])],
             [...Arr::only($data, ['name', 'email', 'phone', 'arrival', 'departure', 'guests', 'message', 'accommodation_id']),
                 'reference' => (string) Str::uuid(), 'kind' => $form->kind(), 'locale' => app()->getLocale(),
-                'accommodation_label' => $accommodation ? data_get($accommodation->published, 'title.'.app()->getLocale()) : null,
+                'accommodation_label' => $accommodation ? data_get($accommodation->published, 'redesign.title.'.app()->getLocale(), data_get($accommodation->published, 'title.'.app()->getLocale())) : null,
             ],
         );
         if ($record->wasRecentlyCreated) {
