@@ -276,7 +276,7 @@ function submit(): void {
                         required
                         maxlength="32"
                         :aria-invalid="!!form.errors.phone"
-                        aria-describedby="phone-hint phone-error"
+                        :aria-describedby="`${fieldId('phone-hint')} ${fieldId('phone-error')}`"
                     />
                     <p :id="fieldId('phone-hint')" class="resort-muted text-sm">
                         {{ text('form_phone_hint') }}

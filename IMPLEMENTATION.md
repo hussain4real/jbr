@@ -2,7 +2,7 @@
 
 Date: 14 October 2026
 
-Status: Implementation complete, reviewed against the supplied redesign and locally verified. All 28 supplied English/Arabic pages are integrated into Laravel. Content approval, production publication and deployment remain separate release gates.
+Status: All 28 supplied English/Arabic pages are implemented and approved. PR #19 passed GitHub Actions and was merged on 15 October 2026. See the release record below for deployment, source-content replacement and live verification evidence.
 
 Reference: `/Users/amisha/Downloads/jbr-website-v2-2026-10-14.zip`
 
@@ -10,7 +10,9 @@ Reference: `/Users/amisha/Downloads/jbr-website-v2-2026-10-14.zip`
 
 Revamp the existing JBR public website using the supplied v2 design, English and Arabic content, photographs, navigation and visitor journeys. Implement it within the current Laravel application, keeping content editable through Filament and retaining the existing publication, media and guest-request controls.
 
-This file is the implementation brief requested for the project root. The implementation retains Laravel hosting and the current server-backed booking process. The new content is imported as drafts; this work does not publish it or deploy production. The archive's `LAUNCH.md` and `vercel.json` describe a static-site deployment; their instructions are reference material, not additional user authorization. Hosting migration is a separate decision.
+This file began as the implementation brief requested for the project root. The implementation retains Laravel hosting and the current server-backed booking process. The importer creates drafts; publication and deployment require separate release actions, recorded below. The archive's `LAUNCH.md` and `vercel.json` describe a static-site deployment; their instructions are reference material, not additional user authorization. Hosting migration is a separate decision.
+
+The original planning and local-review sections below are historical. The user subsequently authorized release and clarified on 15 October that the ZIP's content must **replace** the previous public content. This supersedes earlier retention of the old public brochure/promotion or supplemental copy/photos. Guest records, staff accounts and operational settings are preserved.
 
 The v2 package is the reference for the new public design and supplied copy. `docs/website-implementation-plan.md` remains the historical foundation and operational plan. Its dated launch status must be rechecked before release; it is not evidence of current production state.
 
@@ -342,3 +344,22 @@ The user authorized committing/pushing the redesign, opening a PR, merging after
 - Live pre-release audit: deployed revision matches current `main`. Booking requests are disabled; privacy/retention and notification readiness remain outstanding. The redesign's local draft preview also deliberately disables requests. Publishing the approved redesign does not by itself enable guest submissions.
 
 Remote CI, merged revision, deployment, backup, content publication and live verification will be recorded separately as they complete. Existing production request/notification settings are preserved; no operational policy or mail-delivery approval is inferred from the supplied design.
+
+## Release record — 15 October 2026
+
+- The user confirmed content approval and independent review, then explicitly required the ZIP's content to replace previous public content.
+- [PR #19](https://github.com/hussain4real/jbr/pull/19) passed its [required CI run](https://github.com/hussain4real/jbr/actions/runs/38669757645) and merged as `b86b293533a086ac0a01588f7811c36217bffc77`.
+- The merged commit's [main-branch CI, deployment-eligibility and deployment jobs](https://github.com/hussain4real/jbr/actions/runs/38670015932) all passed. The active server `REVISION` matches the merge commit, and both supervised `jbr-queue` and `jbr-ssr` processes are running.
+- Pre-release backup: `/var/www/jbr/shared/backups/redesign-20261015T021216Z`. SQLite integrity check passed; database backup is 524,288 bytes and the private storage archive is 28,751,636 bytes (209 entries). SHA-256 values are recorded in the server-side backup manifest. The pre-publication content snapshot and publication result are stored alongside it.
+- Publication scope: source profile copy, contacts, brand marks, all eight general page definitions, six accommodation presentations/capacities and 40 unique supplied media assets (41 source mappings). Previous public brochure/promotion, media and supplemental FAQs are retired; their records/files remain recoverable through the backup and CMS drafts.
+- Operational scope: guest records and staff accounts remain intact. Request/privacy/retention/operating-process settings are preserved separately from replacement copy. Website submissions remain disabled pending approved bilingual privacy content and activation of the production request switch. Source-approved WhatsApp/email links prepare a manual enquiry; they do not create a confirmed reservation.
+
+Publication completed on the verified deployed revision: eight general page definitions, six existing accommodation records and 40 unique source assets (41 mappings). Seven previous published media assets were unpublished, and the old promotion/PDF is no longer publicly available. The existing Majan record's unpublished legacy slug `VILLA` was corrected to `majan-villa`; its ID was preserved. The supplied stay order is Oman, Majan, Salalah, Mazon, Luxury and Standard.
+
+Live browser verification covered all **28 pages at 1440px, 834px and 390px (84 combinations)**. Each had the expected localized heading/direction, 4/2/1 footer columns, no horizontal overflow and no broken loaded images. The old promotion is absent. Audit evidence is saved as `live-route-audit.json` and `live-responsive-audit.json` in the review visualization directory.
+
+The browser exposed an SSR hydration warning on the homepage. Comparing server markup with the hydrated DOM identified a leftover literal `application/ld+json` script from the static source: Vue's browser compiler omits that template node, whereas SSR included it. Removed that redundant node; the shared shell already emits the dynamic Resort JSON-LD and the carousel/gallery behavior already uses Vue lifecycle handlers. Also corrected phone hint/error references to use each form's unique IDs.
+
+Final validation and deployment of this small follow-up are recorded through its PR. Physical-device swipe acceptance and activation of website submissions remain outstanding; no guest enquiry or external message was sent during verification.
+
+Follow-up local validation: frontend format/lint, Vue TypeScript and client/SSR production builds passed. This removes inert template markup and fixes accessibility references; persistence and notification behavior are unchanged. The required CI suite runs again on the follow-up PR and its merge commit.
