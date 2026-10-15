@@ -67,7 +67,7 @@ const {
         <section>
             <div class="wrap split">
                 <div class="txt">
-                    <p class="lede">
+                    <p class="lede" style="white-space: pre-line">
                         {{ text('2_section_0_div_0_div_0_p_0') }}
                     </p>
                     <a
